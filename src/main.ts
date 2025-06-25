@@ -24,31 +24,25 @@ let selected = -1;
 export let locked = false;
 const satellites: Satellite[] = []
 
-export const FETCH_INTERVAL = 200 //ms
-
 init();
 
 // La plus grande partie du code vient de https://threejs.org/examples/?q=earth#webgpu_tsl_earth
 function init() {
-	camera = new PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 0.1, 100 );
-    camera.fov = 20
-    camera.zoom = 2.0
-	camera.position.set( 4.5, 2, 3 );
-	scene = new Scene();
-    raycast = new Raycaster()
-
 	const t = textures()
     const o = objets(t)
     globe = o.globe
+    scene = o.scene
+    camera = o.camera
+    raycast = o.raycast
     tween = new Group()
 	
 	scene.add( o.sun );
 	scene.add( o.globe );
 	scene.add( o.atmosphere );
 
-    const r = moteur({ animate, camera })
-    renderer = r.renderer
-    controls = r.controls
+    const m = moteur({ animate, camera })
+    renderer = m.renderer
+    controls = m.controls
 
     ui.init({
         lock() {

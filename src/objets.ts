@@ -1,4 +1,6 @@
-import { MeshStandardNodeMaterial, SphereGeometry, Mesh, DirectionalLight, MeshBasicNodeMaterial, BackSide} from 'three/webgpu';
+import { MeshStandardNodeMaterial, SphereGeometry, Mesh, DirectionalLight, 
+    MeshBasicNodeMaterial, BackSide, Scene, Raycaster, PerspectiveCamera
+} from 'three/webgpu';
 import { step, normalWorld, output, texture, vec3, vec4, normalize, 
     positionWorld, bumpMap, cameraPosition,
     mix, uv, max } from 'three/tsl';
@@ -49,9 +51,22 @@ export default (t: Textures) => {
     const atmosphere = new Mesh( sphereGeometry, atmosphereMaterial );
     atmosphere.scale.setScalar( 1.04 );
 
+    // camera
+    const camera = new PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 0.1, 100 );
+    camera.fov = 20
+    camera.zoom = 2.0
+	camera.position.set( 4.5, 2, 3 );
+
+    // scene & raycast
+	const scene = new Scene();
+    const raycast = new Raycaster()
+
     return {
         globe,
         sun,
-        atmosphere
+        atmosphere,
+        camera,
+        scene,
+        raycast
     }
 }

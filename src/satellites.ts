@@ -1,6 +1,5 @@
 import { Mesh, MeshBasicMaterial, Scene, SphereGeometry } from "three/webgpu"
 import { Group, Tween } from "@tweenjs/tween.js"
-import { FETCH_INTERVAL } from "./main"
 
 interface Payload {
     position: [number, number, number]
@@ -18,23 +17,83 @@ export default class Satellite {
     private couleur_animation?: Tween
     private position_call?: NodeJS.Timeout
     private couleur_call?: NodeJS.Timeout
+    private socket?: WebSocket
+    private position_interval: number = 200 // in ms
+    private couleur_interval: number = 1000 
     constructor({ position, couleur, name, url }: Payload & { name: string, url: string }, group: Group) {
         this.position = position,
         this.couleur = couleur
         this.url = url
         this.name = name
         this.mesh = this.createMesh()
-        this.setupAnimation(group)
         this.setupCalls()        
+        this.setupAnimation(group)
     }
     private setupCalls() {
+        if(this.url.startsWith('ws')) {
+            this.setupSocket()
+            return
+        }
+
+        fetch(this.url + ':7192/health')
+            .then(response => response.json())
+            .catch((error) => {
+                console.error(`Failed to intercept ${this.name}'s health`, error)
+                return null
+            })
+            .then(data => {
+                if(data == null) return
+                else if(typeof data === 'object' 
+                && 'position' in data && 'couleur' in data) {
+                    this.position_interval = data.position
+                    this.couleur_interval = data.couleur
+                    this.setupIntervals()
+                }
+            })
+    }
+    private setupSocket() {
+        this.socket = new WebSocket(this.url + ':7192')
+        this.socket.addEventListener('message', (event) => {
+            const data = JSON.parse(event.data)
+            if(!('type' in data)) {
+                return
+            }
+            switch(data.type) {
+                case 'position':
+                    if(data.position instanceof Array && data.position.length == 3) {
+                        const position = data.position as [number, number, number]
+                        this.update({
+                            position
+                        })
+                    }
+                    break;
+                case 'couleur':
+                    if(data.couleur instanceof Array && data.couleur.length == 3) {
+                        const couleur = data.couleur as [number, number, number]
+                        this.update({
+                            couleur
+                        })
+                    }
+                    break;
+                case 'health':
+                    if('position' in data && 'couleur' in data
+                        && typeof data.position === 'number'
+                        && typeof data.couleur === 'number' ) {
+                        this.position_interval = data.position
+                        this.couleur_interval = data.couleur
+                    }
+                    break;
+            }
+        })
+    }
+    private setupIntervals() {
         let controller_position: AbortController | null = null
         this.position_call = setInterval(async () => {
             if(controller_position) controller_position.abort()
             controller_position = new AbortController()
 
             try {
-                const response = await fetch(this.url + '/position', {
+                const response = await fetch(this.url + ':7192/position', {
                     signal: controller_position.signal
                 })
                 if(response.status != 200) return
@@ -48,7 +107,7 @@ export default class Satellite {
             } finally {
                 controller_position = null
             }
-        }, FETCH_INTERVAL)
+        }, this.position_interval)
 
         let controller_couleur: AbortController | null = null
         this.couleur_call = setInterval(async () => {
@@ -56,7 +115,7 @@ export default class Satellite {
             controller_couleur = new AbortController()
 
             try {
-                const response = await fetch(this.url + '/couleur', {
+                const response = await fetch(this.url + ':7192/color', {
                     signal: controller_couleur.signal
                 })
     
@@ -70,7 +129,7 @@ export default class Satellite {
             } finally {
                 controller_couleur = null
             }
-        }, 1000);
+        }, this.couleur_interval);
     }
     private createMesh() {
         const geometry = new SphereGeometry(0.05, 32, 32)
@@ -92,7 +151,7 @@ export default class Satellite {
             z: this.position[2],
         })
         .onUpdate(({ x, y, z }) => this.mesh.position.set(x, y, z))
-        .duration(FETCH_INTERVAL)
+        .duration(this.position_interval)
 
         group.add(position_animation)
         this.position_animation = position_animation
@@ -105,7 +164,7 @@ export default class Satellite {
         .onUpdate(({ r, g, b }) => this.mesh.material.color
             .fromArray([r / 255, g / 255, b / 255])
         )
-        .duration(1000)
+        .duration(this.couleur_interval)
 
         group.add(couleur_animation)
         this.couleur_animation = couleur_animation
@@ -139,8 +198,10 @@ export default class Satellite {
         }
     }
     cleanup(scene: Scene) {
-        clearTimeout(this.couleur_call)
-        clearTimeout(this.position_call)
+        if(this.couleur_call) clearTimeout(this.couleur_call)
+        if(this.position_call) clearTimeout(this.position_call)
+        if(this.socket) this.socket.close()
+
         this.mesh.material.dispose()
         this.mesh.clear()
         scene.remove(this.mesh)

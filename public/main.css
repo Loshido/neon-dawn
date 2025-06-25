@@ -122,7 +122,7 @@ main{
     
     flex-direction: column;
     gap: 2px;
-    transition: transform .3s ease-in-out, opacity .2s ease-out;
+    transition: transform .3s ease, opacity .2s ease-out;
     transform: translateX(100%);
     opacity: 0;
 }
