@@ -13,7 +13,7 @@ export interface Textures {
 
 export default (): Textures => {
     const atmosphereDayColor = uniform( color( '#4db2ff' ) );
-    const atmosphereTwilightColor = uniform( color( '#bc490b' ) );
+    const atmosphereTwilightColor = uniform( color( '#481414' ) );
     const roughnessLow = uniform( 0.25 );
     const roughnessHigh = uniform( 0.35 );
 

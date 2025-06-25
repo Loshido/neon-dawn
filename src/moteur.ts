@@ -18,6 +18,9 @@ export default ({ animate, camera }: RendererProps) => {
 	controls.enableDamping = true;
 	controls.minDistance = 0.1;
 	controls.maxDistance = 50;
+    controls.autoRotate = true
+    controls.autoRotateSpeed = 0.25
+    controls.enablePan = false
 
     return {
         renderer,

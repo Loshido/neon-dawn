@@ -6,35 +6,12 @@ body {
 	font-size: 13px;
 	line-height: 24px;
 	overscroll-behavior: none;
-}
-
-a {
-	color: #ff0;
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
+    overflow: hidden;
 }
 
 button {
 	cursor: pointer;
 	text-transform: uppercase;
-}
-
-#info {
-	position: absolute;
-	top: 0px;
-	width: 100%;
-	padding: 10px;
-	box-sizing: border-box;
-	text-align: center;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	pointer-events: none;
-	z-index: 1; /* TODO Solve this in HTML */
 }
 
 a, button, input, select {
@@ -71,16 +48,16 @@ a, button, input, select {
 	background: rgba(0,0,0,0.7);
 }
 
-	#overlay button {
-		background: transparent;
-		border: 0;
-		border: 1px solid rgb(255, 255, 255);
-		border-radius: 4px;
-		color: #ffffff;
-		padding: 12px 18px;
-		text-transform: uppercase;
-		cursor: pointer;
-	}
+#overlay button {
+	background: transparent;
+	border: 0;
+	border: 1px solid rgb(255, 255, 255);
+	border-radius: 4px;
+	color: #ffffff;
+	padding: 12px 18px;
+	text-transform: uppercase;
+	cursor: pointer;
+}
 
 #notSupported {
 	width: 50%;
@@ -88,4 +65,98 @@ a, button, input, select {
 	background-color: #f00;
 	margin-top: 20px;
 	padding: 10px;
+}
+
+section{
+    z-index: 15;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #fffb;
+    border-radius: 0 0 0 8px;
+    min-width: 400px;
+    backdrop-filter: blur(4px);
+}
+
+section > nav{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+}
+section > nav > svg{
+    padding: 8px;
+    transition: background-color .1s ease-in-out;
+    border-radius: 4px;
+    cursor:pointer;
+    stroke: black;
+    stroke-width: 3;
+}
+section > nav > svg:hover{
+    background-color: #0002;
+}
+
+section > nav > svg.active{
+    background-color: #0001;
+}
+section > nav > svg#lock .open,
+section > nav > svg#lock.active :not(.open){
+    display: none;
+}
+section > nav > svg#lock.active .open,
+section > nav > svg#lock :not(.open){
+    display: block;
+}
+
+main{
+    z-index: 10;
+    position: absolute;
+    display: flex;
+    background-color: #fff6;
+    top: 100%;
+    right: 0;
+    width: calc(100% - 48px);
+    border-radius: 0 0 0 8px;
+    padding: 8px 16px;
+    
+    flex-direction: column;
+    gap: 2px;
+    transition: transform .3s ease-in-out, opacity .2s ease-out;
+    transform: translateX(100%);
+    opacity: 0;
+}
+section:has(nav > svg#orbit.active) > main{
+    opacity: 1;
+    transform: translateX(0);
+}
+
+main > div *{
+    padding: 0;
+    margin: 0;
+}
+
+main > div{
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: 1fr 2fr 24px;
+}
+main > div > p{
+    outline: none;
+    border: none;
+}
+main > div.active > svg > path:not(.active),
+main > div:not(.active) > svg > path.active{
+    display: none;
+}
+main > div > svg{
+    width: 24px;
+    height: 24px;
+    transition: background-color .1s ease-in-out;
+    border-radius: 2px;
+    cursor: pointer;
+}
+main > div > svg:hover{
+    background-color: #0006;
 }
