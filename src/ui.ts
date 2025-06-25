@@ -7,8 +7,9 @@ export const ui = {
     }) {
         const lock = document.querySelector('svg#lock')
         const rotation = document.querySelector('svg#rotate')
+        const open = document.querySelector('svg#open')
         const orbit = document.querySelector('svg#orbit')
-        if(!lock || !rotation || !orbit) return
+        if(!lock || !rotation || !orbit || !open) return
     
         lock.addEventListener('click', () => {
             this.lock(callback.lock())
@@ -18,6 +19,9 @@ export const ui = {
         })
         orbit.addEventListener('click', () => {
             this.orbit()
+        })
+        open.addEventListener('click', () => {
+            this.show()
         })
 
         const div = document.querySelector('main > div:not(.active)')
@@ -44,6 +48,14 @@ export const ui = {
         if(!element) return
 
         element.classList.toggle('active', state)
+    },
+    show(state?: boolean) {
+        const element = document.querySelector('svg#open')
+        if(!element) return
+
+        if(element.classList.toggle('active', state)) {
+            this.orbit(false)
+        }
     }
 }
 
@@ -90,7 +102,7 @@ function initialise(div: Element, callback: {
         svg = copy.querySelector('svg') as HTMLElement | null
         if(!name || !url || !svg) return 
         name.innerText = "Nom du groupe"
-        url.innerText = "http://localhost:5173"
+        url.innerText = "http://localhost"
         initialise(copy, callback)
         
         div.parentElement.appendChild(copy)
