@@ -21,7 +21,7 @@ let tween: Group
 let raycast: Raycaster
 let pointer: Vector2 = new Vector2()
 let selected = -1;
-export let locked = false;
+export let locked = true;
 const satellites: Satellite[] = []
 
 init();
@@ -44,7 +44,12 @@ function init() {
     renderer = m.renderer
     controls = m.controls
 
+    let sats: string | null | [string, string][]  = localStorage.getItem('satellites')
+    if(sats) {
+        sats = JSON.parse(sats) as [string, string][]
+    }
     ui.init({
+        satellites: typeof sats == 'object' && !!sats ? sats : [],
         lock() {
             locked = !locked
             return locked
@@ -59,6 +64,7 @@ function init() {
                     s.cleanup(scene)
                 }
             })
+            localStorage.setItem('satellites', JSON.stringify(satellites.map(s => [s.name, s.url])))
         },
         validate(name, url) {
             if(satellites.some(s => s.name == name)) {
@@ -69,12 +75,28 @@ function init() {
                 couleur: [255, 255, 0],
                 url,
                 name,
-            }, tween)
+            }, tween, scene)
             satellites.push(s)
-            scene.add(s.mesh)
+            localStorage.setItem('satellites', JSON.stringify(satellites.map(s => [s.name, s.url])))
             return true
+        },
+        focus(name?: string) {
+            if(name) {
+                const i = satellites.findIndex(s => s.name == name)
+                if(i >= 0 && satellites[i].mesh) {
+                    selected = i
+                    controls.target = satellites[i].mesh.position
+                }
+                
+            } else if(globe instanceof Mesh) {
+                selected = -1
+                controls.target = globe.position
+            }
+            controls.update()
         }
     })
+
+    
 
     window.addEventListener('click', onClick)
 	window.addEventListener( 'resize', onWindowResize );
@@ -101,7 +123,7 @@ function onClick(event: MouseEvent) {
     distances.sort((a, b) => a[0] - b[0])
     if(distances.length > 0) {
         satellites.forEach((s, i) => {
-            if(s.mesh == distances[0][1]) {
+            if(s.mesh && s.mesh.name == distances[0][1].name) {
                 if(i != selected) {
                     selected = i
                     controls.target = s.mesh.position
@@ -111,8 +133,8 @@ function onClick(event: MouseEvent) {
         if(globe == distances[0][1]) {
             selected = -1
             controls.target = globe.position
-            controls.update
         }
+        controls.update()
     }
 }
 

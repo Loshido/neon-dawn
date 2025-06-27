@@ -1,9 +1,11 @@
 export const ui = {
-    init(callback: { 
+    init(callback: {
+        satellites: [string, string][],
         lock: () => boolean, 
         rotation: () => boolean, 
         validate: (name: string, url: string) => boolean 
-        invalidate: (name: string) => void
+        invalidate: (name: string) => void,
+        focus: (name?: string) => void
     }) {
         const lock = document.querySelector('svg#lock')
         const rotation = document.querySelector('svg#rotate')
@@ -26,10 +28,25 @@ export const ui = {
 
         const div = document.querySelector('main > div:not(.active)')
         if(!div) return
+
+        for(const [name, url] of callback.satellites) {
+            const pname = document.querySelector('p.name') as HTMLParagraphElement | null
+            const purl = document.querySelector('p.url') as HTMLParagraphElement | null
+            if(pname && purl) {
+                pname.innerText = name
+                purl.innerText = url
+            }
+            next(div, name, url, {
+                validate: callback.validate,
+                invalidate: callback.invalidate,
+                focus: callback.focus
+            })
+        }
         initialise(div, { 
             validate: callback.validate,
-            invalidate: callback.invalidate
-         })
+            invalidate: callback.invalidate,
+            focus: callback.focus
+        })
     },
     lock: (state: boolean) => {
         const element = document.querySelector('svg#lock')
@@ -59,9 +76,12 @@ export const ui = {
     }
 }
 
-function initialise(div: Element, callback: { 
-    validate: (name: string, url: string) => boolean, invalidate: (name: string) => void
-}) {
+type CB = {
+    validate: (name: string, url: string) => boolean, invalidate: (name: string) => void,
+    focus: (name?: string) => void
+}
+
+function initialise(div: Element, callback: CB) {
     let svg = div.querySelector('svg') as Element | null
     if(!svg) return
     
@@ -72,39 +92,49 @@ function initialise(div: Element, callback: {
         // if already clicked return
         if(div.classList.contains('active') || !name || !url) return
 
-        // we instanciate the new satellite
-        const identifier = name.innerText
-        if(!callback.validate(identifier, url.innerText)) {
-            return
-        }
-
-        // make sure we can delete the div
-        let svg = div.querySelector('svg') as HTMLElement | null
-        if(!svg) return
-        svg.addEventListener('click', () => {
-            callback.invalidate(identifier)
-            div.remove()
-        })
-
-        // clone the div
-        const copy = div.cloneNode(true) as HTMLDivElement 
-
-        // activate the div
-        div.classList.toggle('active', true)
-        // disable inputs
-        div.querySelectorAll('p').forEach(p => p.contentEditable = "false")
-
-        if(!div.parentElement) return 
-        
-        // reset inputs
-        name = copy.querySelector('p.name') as HTMLParagraphElement | null
-        url = copy.querySelector('p.url') as HTMLParagraphElement | null
-        svg = copy.querySelector('svg') as HTMLElement | null
-        if(!name || !url || !svg) return 
-        name.innerText = "Nom du groupe"
-        url.innerText = "http://localhost"
-        initialise(copy, callback)
-        
-        div.parentElement.appendChild(copy)
+        next(div, name.innerText, url.innerText, callback)
     })
+}
+
+function next(div: Element, name: string, url: string, cb: CB) {
+    // we instanciate the new satellite
+    if(!cb.validate(name, url)) {
+        return
+    }
+    let name_p = div.querySelector('p.name') as HTMLParagraphElement | null
+    let url_p = div.querySelector('p.url') as HTMLParagraphElement | null
+
+    if(!name_p || !url_p) return
+
+    // make sure we can delete the div
+    let svg = div.querySelector('svg') as HTMLElement | null
+    if(!svg) return
+    svg.addEventListener('click', () => {
+        cb.invalidate(name)
+        div.remove()
+    })
+
+    // clone the div
+    const copy = div.cloneNode(true) as HTMLDivElement 
+
+    // activate the div
+    div.classList.toggle('active', true)
+    // disable inputs
+    div.querySelectorAll('p').forEach(p => p.contentEditable = "false")
+    name_p.addEventListener('click', () => {
+        cb.focus(name)
+    })
+
+    if(!div.parentElement) return 
+        
+    // reset inputs
+    name_p = copy.querySelector('p.name') as HTMLParagraphElement | null
+    url_p = copy.querySelector('p.url') as HTMLParagraphElement | null
+    svg = copy.querySelector('svg') as HTMLElement | null
+    if(!name_p || !url_p || !svg) return 
+    name_p.innerText = "Nom du groupe"
+    url_p.innerText = "http://localhost"
+    initialise(copy, cb)
+        
+    div.parentElement.appendChild(copy)
 }

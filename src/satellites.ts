@@ -1,5 +1,6 @@
-import { Mesh, MeshBasicMaterial, Scene, SphereGeometry } from "three/webgpu"
-import { Group, Tween } from "@tweenjs/tween.js"
+import { Scene, type Object3D  } from "three/webgpu"
+import { Group as TweenGroup, Tween } from "@tweenjs/tween.js"
+import { chargerModele } from "./models"
 
 interface Payload {
     position: [number, number, number]
@@ -10,7 +11,7 @@ export default class Satellite {
     name: string
     url: string
     position: [number, number, number]
-    mesh: Mesh<SphereGeometry, MeshBasicMaterial>
+    mesh?: Object3D
     
     private couleur: [number, number, number]
     private position_animation?: Tween
@@ -20,12 +21,12 @@ export default class Satellite {
     private socket?: WebSocket
     private position_interval: number = 200 // in ms
     private couleur_interval: number = 1000 
-    constructor({ position, couleur, name, url }: Payload & { name: string, url: string }, group: Group) {
+    constructor({ position, couleur, name, url }: Payload & { name: string, url: string }, group: TweenGroup, scene: Scene) {
         this.position = position,
         this.couleur = couleur
         this.url = url
         this.name = name
-        this.mesh = this.createMesh()
+        this.createMesh(scene)
         this.setupCalls()        
         this.setupAnimation(group)
     }
@@ -131,26 +132,33 @@ export default class Satellite {
             }
         }, this.couleur_interval);
     }
-    private createMesh() {
-        const geometry = new SphereGeometry(0.05, 32, 32)
-        const texture = new MeshBasicMaterial({
-            color: `rgb(${this.couleur[0]}, ${this.couleur[1]}, ${this.couleur[2]})`
-        })
-
-        const mesh = new Mesh(geometry, texture)
-        mesh.position.x = this.position[0]
-        mesh.position.y = this.position[1]
-        mesh.position.z = this.position[2]
-        
-        return mesh
+    private createMesh(scene: Scene) {
+        chargerModele("./model/satellite.glb", (modele => {
+            if(modele.scene.children.length == 0) {
+                throw new Error('Empty modele');
+            }
+            this.mesh = modele.scene.children[0]
+            this.mesh.name = this.name
+            this.mesh.position.x = this.position[0]
+            this.mesh.position.y = this.position[1]
+            this.mesh.position.z = this.position[2]
+            this.mesh.scale.x = 0.001
+            this.mesh.scale.y = 0.001
+            this.mesh.scale.z = 0.001
+            scene.add(this.mesh)
+        }))
     }
-    private setupAnimation(group: Group) {
+    private setupAnimation(group: TweenGroup) {
         const position_animation = new Tween({
             x: this.position[0],
             y: this.position[1],
             z: this.position[2],
         })
-        .onUpdate(({ x, y, z }) => this.mesh.position.set(x, y, z))
+        .onUpdate(({ x, y, z }) => {
+            this.mesh?.position.set(x, y, z)
+            this.mesh?.lookAt(0, 0, 0)
+            this.mesh?.rotateY(Math.PI / 2)
+        })
         .duration(this.position_interval)
 
         group.add(position_animation)
@@ -161,9 +169,6 @@ export default class Satellite {
             g: this.position[1],
             b: this.position[2],
         })
-        .onUpdate(({ r, g, b }) => this.mesh.material.color
-            .fromArray([r / 255, g / 255, b / 255])
-        )
         .duration(this.couleur_interval)
 
         group.add(couleur_animation)
@@ -201,9 +206,6 @@ export default class Satellite {
         if(this.couleur_call) clearTimeout(this.couleur_call)
         if(this.position_call) clearTimeout(this.position_call)
         if(this.socket) this.socket.close()
-
-        this.mesh.material.dispose()
-        this.mesh.clear()
-        scene.remove(this.mesh)
+        if(this.mesh) scene.remove(this.mesh)
     }
 }
