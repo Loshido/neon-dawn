@@ -1,5 +1,5 @@
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-import { type PerspectiveCamera, WebGPURenderer } from "three/webgpu";
+import { ACESFilmicToneMapping, type PerspectiveCamera, WebGPURenderer } from "three/webgpu";
 
 interface RendererProps {
     animate: () => void,
@@ -11,8 +11,14 @@ export default ({ animate, camera }: RendererProps) => {
 	const renderer = new WebGPURenderer();
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
+
 	renderer.setAnimationLoop( animate );
+    renderer.shadowMap.enabled = true
+    renderer.toneMapping = ACESFilmicToneMapping
+    renderer.toneMappingExposure = 1
+
 	document.body.appendChild( renderer.domElement );
+    
 	// controls
 	const controls = new OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;

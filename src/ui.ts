@@ -26,7 +26,7 @@ export const ui = {
             this.show()
         })
 
-        const div = document.querySelector('main > div:not(.active)')
+        let div = document.querySelector('main > div:not(.active)')
         if(!div) return
 
         for(const [name, url] of callback.satellites) {
@@ -36,7 +36,7 @@ export const ui = {
                 pname.innerText = name
                 purl.innerText = url
             }
-            next(div, name, url, {
+            div = next(div, name, url, {
                 validate: callback.validate,
                 invalidate: callback.invalidate,
                 focus: callback.focus
@@ -96,19 +96,19 @@ function initialise(div: Element, callback: CB) {
     })
 }
 
-function next(div: Element, name: string, url: string, cb: CB) {
+function next(div: Element, name: string, url: string, cb: CB): Element {
     // we instanciate the new satellite
     if(!cb.validate(name, url)) {
-        return
+        return div
     }
     let name_p = div.querySelector('p.name') as HTMLParagraphElement | null
     let url_p = div.querySelector('p.url') as HTMLParagraphElement | null
 
-    if(!name_p || !url_p) return
+    if(!name_p || !url_p) return div
 
     // make sure we can delete the div
     let svg = div.querySelector('svg') as HTMLElement | null
-    if(!svg) return
+    if(!svg) return div
     svg.addEventListener('click', () => {
         cb.invalidate(name)
         div.remove()
@@ -125,16 +125,17 @@ function next(div: Element, name: string, url: string, cb: CB) {
         cb.focus(name)
     })
 
-    if(!div.parentElement) return 
+    if(!div.parentElement) return div
         
     // reset inputs
     name_p = copy.querySelector('p.name') as HTMLParagraphElement | null
     url_p = copy.querySelector('p.url') as HTMLParagraphElement | null
     svg = copy.querySelector('svg') as HTMLElement | null
-    if(!name_p || !url_p || !svg) return 
+    if(!name_p || !url_p || !svg) return div
     name_p.innerText = "Nom du groupe"
     url_p.innerText = "http://localhost"
     initialise(copy, cb)
         
     div.parentElement.appendChild(copy)
+    return copy
 }

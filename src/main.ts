@@ -2,6 +2,7 @@ import {
     PerspectiveCamera, Scene, WebGPURenderer, 
     MeshStandardNodeMaterial, Mesh,
     Raycaster, Vector2, type Object3D,
+    PostProcessing,
 } from 'three/webgpu';
 import { Group } from '@tweenjs/tween.js';
 
@@ -11,6 +12,8 @@ import objets from './objets';
 import moteur from './moteur';
 import Satellite from './satellites';
 import { ui } from './ui';
+import { pass } from 'three/tsl';
+import { smaa } from 'three/examples/jsm/tsl/display/SMAANode.js';
 
 let camera: PerspectiveCamera;
 let scene: Scene;
@@ -20,6 +23,7 @@ let globe: MeshStandardNodeMaterial | Mesh;
 let tween: Group
 let raycast: Raycaster
 let pointer: Vector2 = new Vector2()
+let post: PostProcessing
 let selected = -1;
 export let locked = true;
 const satellites: Satellite[] = []
@@ -96,11 +100,16 @@ function init() {
         }
     })
 
-    
-
     window.addEventListener('click', onClick)
 	window.addEventListener( 'resize', onWindowResize );
     window.addEventListener('keydown', onKeyDown)
+
+    // post processing
+    post = new PostProcessing(renderer)
+    
+    const scenePass = pass(scene, camera)
+    const smaaPass = smaa( scenePass )
+    post.outputNode = smaaPass
 }
 
 function onWindowResize() {
@@ -167,4 +176,5 @@ async function animate() {
     tween.update()
 	controls.update();
 	renderer.render( scene, camera );
+    // post.render()
 }
