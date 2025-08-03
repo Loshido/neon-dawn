@@ -41,12 +41,19 @@ export const ui = {
                 invalidate: callback.invalidate,
                 focus: callback.focus
             })
+
+            if(name === "URL") {
+                setTimeout(() => {
+                    callback.focus(name)
+                }, 1500)
+            }
         }
         initialise(div, { 
             validate: callback.validate,
             invalidate: callback.invalidate,
             focus: callback.focus
         })
+        return this
     },
     lock: (state: boolean) => {
         const element = document.querySelector('svg#lock')
@@ -124,6 +131,7 @@ function next(div: Element, name: string, url: string, cb: CB): Element {
     name_p.addEventListener('click', () => {
         cb.focus(name)
     })
+    name_p.id = `satellite-${name}`
 
     if(!div.parentElement) return div
         
@@ -137,5 +145,6 @@ function next(div: Element, name: string, url: string, cb: CB): Element {
     initialise(copy, cb)
         
     div.parentElement.appendChild(copy)
+
     return copy
 }

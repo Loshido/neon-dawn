@@ -3,6 +3,10 @@ import {
     MeshStandardNodeMaterial, Mesh,
     Raycaster, Vector2, type Object3D,
     PostProcessing,
+    Line,
+    BufferGeometry,
+    LineBasicMaterial,
+    Float32BufferAttribute,
 } from 'three/webgpu';
 import { Group } from '@tweenjs/tween.js';
 
@@ -27,6 +31,7 @@ let post: PostProcessing
 let selected = -1;
 export let locked = true;
 const satellites: Satellite[] = []
+let line: Line | undefined
 
 init();
 
@@ -48,10 +53,18 @@ function init() {
     renderer = m.renderer
     controls = m.controls
 
-    let sats: string | null | [string, string][]  = localStorage.getItem('satellites')
-    if(sats) {
-        sats = JSON.parse(sats) as [string, string][]
+    const url = new URL(window.location.toString())
+    const param = url.searchParams.get('satellite')
+    let sats: string | null | [string, string][]
+    if(param && (param.startsWith('http://') || param.startsWith('ws://'))) {
+        sats = [["URL", param]]
+    } else {
+        sats = localStorage.getItem('satellites')
+        if(sats) {
+            sats = JSON.parse(sats) as [string, string][]
+        }
     }
+
     ui.init({
         satellites: typeof sats == 'object' && !!sats ? sats : [],
         lock() {
@@ -63,11 +76,16 @@ function init() {
             return controls.autoRotate
         },
         invalidate(name) {
-            satellites.forEach(s => {
+            const i = satellites.reduce((i, s, index) => {
                 if(s.name == name) {
                     s.cleanup(scene)
+                    return index
                 }
-            })
+                return i
+            }, -1)
+
+            if(i === -1) return;
+            satellites.splice(i, 1)
             localStorage.setItem('satellites', JSON.stringify(satellites.map(s => [s.name, s.url])))
         },
         validate(name, url) {
@@ -90,11 +108,23 @@ function init() {
                 if(i >= 0 && satellites[i].mesh) {
                     selected = i
                     controls.target = satellites[i].mesh.position
+
+                    const geo = new BufferGeometry()
+                    geo.setAttribute('position', new Float32BufferAttribute( satellites[i].historique, 3 ))
+
+                    const mat = new LineBasicMaterial( { color: 0xffffff })
+                    line = new Line(geo, mat)
+                    scene.add(line)
+                    satellites[i].line = line
                 }
                 
             } else if(globe instanceof Mesh) {
                 selected = -1
                 controls.target = globe.position
+                if(line) {
+                    line.remove()
+                    line = undefined
+                }
             }
             controls.update()
         }

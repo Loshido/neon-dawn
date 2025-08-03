@@ -1,4 +1,4 @@
-import { Scene, type Object3D  } from "three/webgpu"
+import { BufferGeometry, Float32BufferAttribute, Line, Scene, Vector3, type Object3D  } from "three/webgpu"
 import { Group as TweenGroup, Tween } from "@tweenjs/tween.js"
 import { chargerModele } from "./models"
 
@@ -11,6 +11,8 @@ export default class Satellite {
     name: string
     url: string
     position: [number, number, number]
+    historique: number[] = []
+    line?: Line
     mesh?: Object3D
     
     private couleur: [number, number, number]
@@ -194,9 +196,20 @@ export default class Satellite {
         }
     }
     update(payload: Omit<Payload, 'position'> | Omit<Payload, 'couleur'>) {
-        if('position' in payload && this.position_animation) {
+        if('position' in payload && this.position_animation && this.mesh) {
             this.position = payload.position
+            this.historique.push(...this.mesh.position)
+            if(this.line) {
+                this.line.geometry.dispose()
+
+                const geo = new BufferGeometry()
+
+                geo.setAttribute('position', new Float32BufferAttribute( this.historique, 3 ))
+
+                this.line.geometry = geo
+            }
             this.animate('position')
+
         } else if(this.couleur_animation && 'couleur' in payload) {
             this.couleur = payload.couleur
             this.animate('couleur')

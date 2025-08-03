@@ -2,13 +2,14 @@ import type { ServerWebSocket } from "bun"
 
 const altitude = 1.3
 let elapsed = 0.0
+let decalage = 0.0
 const position: [number, number, number] = [0, altitude, 0]
 const couleur: [number, number, number] = [0, 255, 0]
 
 const sockets: ServerWebSocket<any>[] = []
 setInterval(() => {
     elapsed += 0.075
-    position[0] = Math.cos(0.01 * elapsed)
+    position[0] = Math.cos(elapsed)
     position[1] = altitude * Math.cos(0.3 * elapsed)
     position[2] = altitude * Math.sin(0.3 * elapsed)
 
@@ -27,6 +28,9 @@ setInterval(() => {
         couleur
     })))
 }, 1000);
+setTimeout(() => {
+    decalage += 10;
+}, 2 * Math.PI);
 
 Bun.serve({
     port: 7192,
