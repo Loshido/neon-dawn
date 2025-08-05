@@ -59,7 +59,8 @@ export const ui = {
             })
         }
         return (name: string, url: string) => {
-            next(div, name, url, {
+            if(!div) return
+            div = next(div, name, url, {
                 validate: callback.validate,
                 invalidate: callback.invalidate,
                 focus: callback.focus

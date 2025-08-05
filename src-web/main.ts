@@ -133,28 +133,31 @@ function init() {
             return true
         },
         focus(name?: string) {
+            if(line) {
+                satellites[selected].line = undefined 
+                line.geometry.dispose()
+                scene.remove(line)
+                line = undefined
+            }
             if(name) {
                 const i = satellites.findIndex(s => s.name == name)
                 if(i >= 0 && satellites[i].mesh) {
-                    selected = i
                     controls.target = satellites[i].mesh.position
 
+                    
                     const geo = new BufferGeometry()
                     geo.setAttribute('position', new Float32BufferAttribute( satellites[i].historique, 3 ))
-
+                    
                     const mat = new LineBasicMaterial( { color: 0xffffff })
                     line = new Line(geo, mat)
                     scene.add(line)
                     satellites[i].line = line
+                    selected = i
                 }
                 
             } else if(globe instanceof Mesh) {
                 selected = -1
                 controls.target = globe.position
-                if(line) {
-                    scene.remove(line)
-                    line = undefined
-                }
             }
             controls.update()
         }
@@ -204,13 +207,26 @@ function onClick(event: MouseEvent) {
     if(distances.length > 0) {
         satellites.forEach((s, i) => {
             if(s.mesh && s.mesh.name == distances[0][1].name) {
-                if(i != selected) {
+                if(i != selected && satellites[i].mesh) {
+                    const geo = new BufferGeometry()
+                    geo.setAttribute('position', new Float32BufferAttribute( satellites[i].historique, 3 ))
+                    
+                    const mat = new LineBasicMaterial( { color: 0xffffff })
+                    line = new Line(geo, mat)
+                    scene.add(line)
+                    satellites[i].line = line
+                    satellites[selected].line = undefined 
                     selected = i
                     controls.target = s.mesh.position
                 }
             }
         })
         if(globe == distances[0][1]) {
+            if(line) {
+                satellites[selected].line = undefined
+                scene.remove(line)
+                line = undefined
+            }
             selected = -1
             controls.target = globe.position
         }

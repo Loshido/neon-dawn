@@ -23,6 +23,17 @@ setTimeout(() => {
     decalage += 10;
 }, 2 * Math.PI);
 
+setTimeout(async () => {
+    const response = await fetch('http://192.168.1.68:8000/register', {
+        method: 'POST',
+        body: JSON.stringify({
+            name: "echo",
+            type: "ws"
+        })
+    })
+    console.log(response.status)
+}, 50)
+
 Deno.serve({
     port: 7192
 }, (req) => {
