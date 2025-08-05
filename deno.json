@@ -1,0 +1,18 @@
+{
+    "tasks": {
+        "web": "deno bundle -o public/main.js src-web/main.ts",
+        "dev": "deno run -A --watch src/main.ts",
+        "client": "deno run -A --watch src-client/main.ts"
+    },
+    "lint": {
+        "include": ["src", "src-web"]
+    },
+    "fmt": {
+        "include": ["src", "src-web"]
+    },
+    "imports": {
+        "@tweenjs/tween.js": "npm:@tweenjs/tween.js@^25.0.0",
+        "@types/three": "npm:@types/three@^0.179.0",
+        "three": "npm:three@^0.179.1"
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "lib": ["dom", "esnext", "deno.window"]
+    },
+    "imports": {
+        "@tweenjs/tween.js": "npm:@tweenjs/tween.js@^25.0.0",
+        "@types/three": "npm:@types/three@^0.179.0",
+        "three": "npm:three@^0.179.1"
+    },
+    "lint": {
+        "rules": {
+            "exclude": ["no-window", "no-window-prefix"]
+        }
+    }
+}

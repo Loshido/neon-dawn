@@ -1,210 +1,86 @@
-import { 
-    PerspectiveCamera, Scene, WebGPURenderer, 
-    MeshStandardNodeMaterial, Mesh,
-    Raycaster, Vector2, type Object3D,
-    PostProcessing,
-    Line,
-    BufferGeometry,
-    LineBasicMaterial,
-    Float32BufferAttribute,
-} from 'three/webgpu';
-import { Group } from '@tweenjs/tween.js';
+import { serveDir } from "jsr:@std/http/file-server";
 
-import type { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import textures from './textures';
-import objets from './objets';
-import moteur from './moteur';
-import Satellite from './satellites';
-import { ui } from './ui';
-import { pass } from 'three/tsl';
-import { smaa } from 'three/examples/jsm/tsl/display/SMAANode.js';
-
-let camera: PerspectiveCamera;
-let scene: Scene;
-let renderer: WebGPURenderer;
-let controls: OrbitControls;
-let globe: MeshStandardNodeMaterial | Mesh;
-let tween: Group
-let raycast: Raycaster
-let pointer: Vector2 = new Vector2()
-let post: PostProcessing
-let selected = -1;
-export let locked = true;
-const satellites: Satellite[] = []
-let line: Line | undefined
-
-init();
-
-// La plus grande partie du code vient de https://threejs.org/examples/?q=earth#webgpu_tsl_earth
-function init() {
-	const t = textures()
-    const o = objets(t)
-    globe = o.globe
-    scene = o.scene
-    camera = o.camera
-    raycast = o.raycast
-    tween = new Group()
-	
-	scene.add( o.sun );
-	scene.add( o.globe );
-	scene.add( o.atmosphere );
-
-    const m = moteur({ animate, camera })
-    renderer = m.renderer
-    controls = m.controls
-
-    const url = new URL(window.location.toString())
-    const param = url.searchParams.get('satellite')
-    let sats: string | null | [string, string][]
-    if(param && (param.startsWith('http://') || param.startsWith('ws://'))) {
-        sats = [["URL", param]]
-    } else {
-        sats = localStorage.getItem('satellites')
-        if(sats) {
-            sats = JSON.parse(sats) as [string, string][]
-        }
-    }
-
-    ui.init({
-        satellites: typeof sats == 'object' && !!sats ? sats : [],
-        lock() {
-            locked = !locked
-            return locked
-        },
-        rotation() {
-            controls.autoRotate = !controls.autoRotate
-            return controls.autoRotate
-        },
-        invalidate(name) {
-            const i = satellites.reduce((i, s, index) => {
-                if(s.name == name) {
-                    s.cleanup(scene)
-                    return index
-                }
-                return i
-            }, -1)
-
-            if(i === -1) return;
-            satellites.splice(i, 1)
-            localStorage.setItem('satellites', JSON.stringify(satellites.map(s => [s.name, s.url])))
-        },
-        validate(name, url) {
-            if(satellites.some(s => s.name == name)) {
-                return false
-            }
-            const s = new Satellite({
-                position: [1.1, 0, 0],
-                couleur: [255, 255, 0],
-                url,
-                name,
-            }, tween, scene)
-            satellites.push(s)
-            localStorage.setItem('satellites', JSON.stringify(satellites.map(s => [s.name, s.url])))
-            return true
-        },
-        focus(name?: string) {
-            if(name) {
-                const i = satellites.findIndex(s => s.name == name)
-                if(i >= 0 && satellites[i].mesh) {
-                    selected = i
-                    controls.target = satellites[i].mesh.position
-
-                    const geo = new BufferGeometry()
-                    geo.setAttribute('position', new Float32BufferAttribute( satellites[i].historique, 3 ))
-
-                    const mat = new LineBasicMaterial( { color: 0xffffff })
-                    line = new Line(geo, mat)
-                    scene.add(line)
-                    satellites[i].line = line
-                }
-                
-            } else if(globe instanceof Mesh) {
-                selected = -1
-                controls.target = globe.position
-                if(line) {
-                    line.remove()
-                    line = undefined
-                }
-            }
-            controls.update()
-        }
-    })
-
-    window.addEventListener('click', onClick)
-	window.addEventListener( 'resize', onWindowResize );
-    window.addEventListener('keydown', onKeyDown)
-
-    // post processing
-    post = new PostProcessing(renderer)
-    
-    const scenePass = pass(scene, camera)
-    const smaaPass = smaa( scenePass )
-    post.outputNode = smaaPass
+type Router = {
+    [path: string]: (req: Request, info: Deno.ServeHandlerInfo<Deno.NetAddr>) 
+        => Response | Promise<Response>
 }
 
-function onWindowResize() {
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
+const streams = new Set<ReadableStreamDefaultController>()
+const routes: Router = {
+    '/events': req => {
+        const stream = new ReadableStream({
+            start(controller) {
+                streams.add(controller)
 
-	renderer.setSize( window.innerWidth, window.innerHeight );
-}
+                const keepAlive = setInterval(() => {
+                    controller.enqueue('event: ping\n\n')
+                }, 15000);
 
-function onClick(event: MouseEvent) {
-    if(locked) return
-
-    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1
-    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    raycast.setFromCamera(pointer, camera)
-
-    const intersects = raycast.intersectObjects(scene.children, false)
-    const distances = intersects.map(i => [i.distance, i.object]) satisfies [number, Object3D][]
-    distances.sort((a, b) => a[0] - b[0])
-    if(distances.length > 0) {
-        satellites.forEach((s, i) => {
-            if(s.mesh && s.mesh.name == distances[0][1].name) {
-                if(i != selected) {
-                    selected = i
-                    controls.target = s.mesh.position
-                }
+                req.signal.addEventListener('abort', () => {
+                    controller.close()
+                    streams.delete(controller)
+                    clearInterval(keepAlive)
+                })
             }
         })
-        if(globe == distances[0][1]) {
-            selected = -1
-            controls.target = globe.position
+
+        return new Response(stream.pipeThrough(new TextEncoderStream()), {
+            headers: {
+                "Content-Type": "text/event-stream",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "Access-Control-Allow-Origin": '*'
+            }
+        })
+    },
+    '/register': async (req, info) => {
+        let type: string = 'http'
+        let name: string = 'inconnu'
+        if(req.method == 'POST') {
+            const payload = await req.json()
+            if(!payload.type || !payload.name) 
+                // illisible
+                return new Response(
+                    "Vous devez joindre un type de transport et un nom.\n"
+                    + JSON.stringify({ 
+                        type: 'http ou ws', 
+                        name: 'string' 
+                    }, undefined, 4), 
+                    {
+                        status: 400
+                    }
+                )
+
+            type = payload.type
+            name = payload.name
         }
-        controls.update()
+        
+        if(type !== 'ws' && type !== 'http')
+            return new Response('"type" invalide.', { status: 400 })
+
+        const url = type + '://' + info.remoteAddr.hostname
+        
+        streams.forEach(stream => {
+            stream.enqueue(`data: ${
+                JSON.stringify({ name, url })
+            }\n\n`)
+        })
+
+        return new Response('ok', { status: 200 })
     }
 }
 
-function onKeyDown(event: KeyboardEvent) {
-    const target = event.target as HTMLElement
-    if(target.tagName === 'P') return;
-    switch(event.key) {
-        case ' ':
-            controls.autoRotate = !controls.autoRotate
-            ui.rotation(controls.autoRotate)
-            break;
-        case 'ArrowUp':
-            controls.autoRotateSpeed += 0.25
-            break;
-        case 'ArrowDown':
-            if(controls.autoRotateSpeed <= 0.0) break;
-            controls.autoRotateSpeed -= 0.25
-            break;
-        case 'l':
-            locked = !locked
-            ui.lock(locked)
-            break;
-        case 'o':
-            ui.orbit()
-            break;
-    }
-}
+Deno.serve((req, info) => {
+    const url = new URL(req.url)
 
-async function animate() {
-    tween.update()
-	controls.update();
-	renderer.render( scene, camera );
-    // post.render()
-}
+    if(url.pathname in routes) {
+        return routes[url.pathname](req, info)
+    }
+    
+    return serveDir(req, {
+        fsRoot: './public',
+        showIndex: true,
+        showDotfiles: false,
+        showDirListing: false
+    })
+})

@@ -138,9 +138,16 @@ main{
     transform: translateX(100%);
     opacity: 0;
 }
+body[data-mode="remote"] main svg{
+    display: none;
+}
+
 section:has(nav > svg#orbit.active) > main{
     opacity: 1;
     transform: translateX(0);
+}
+main > div:has(p[contenteditable="true"]) {
+    display: none;
 }
 
 main > div *{
