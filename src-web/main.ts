@@ -51,7 +51,7 @@ function init() {
 	
 	scene.add( o.sun );
 	scene.add( o.globe );
-	scene.add( o.atmosphere );
+	// scene.add( o.atmosphere );
 
     const m = moteur({ animate, camera })
     renderer = m.renderer
