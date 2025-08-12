@@ -146,7 +146,7 @@ section:has(nav > svg#orbit.active) > main{
     opacity: 1;
     transform: translateX(0);
 }
-main > div:has(p[contenteditable="true"]) {
+body[data-mode="remote"] main > div:has(p[contenteditable="true"]) {
     display: none;
 }
 

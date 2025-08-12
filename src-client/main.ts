@@ -1,4 +1,4 @@
-
+const HOST = "http://192.168.1.68:81"
 const altitude = 1.3
 let elapsed = 0.0
 let decalage = 0.0
@@ -23,8 +23,9 @@ setTimeout(() => {
     decalage += 10;
 }, 2 * Math.PI);
 
+// Register to the host (so that the satellite appears)
 setTimeout(async () => {
-    const response = await fetch('http://192.168.1.68:8000/register', {
+    const response = await fetch(HOST + '/register', {
         method: 'POST',
         body: JSON.stringify({
             name: "echo",
@@ -43,11 +44,10 @@ Deno.serve({
             return new Response(JSON.stringify(position), {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': 'http://localhost:8000'
+                    'Access-Control-Allow-Origin': HOST
                 }
             })
     }
-
     
     if(req.headers.get('upgrade') === 'websocket') {
         const { socket, response } = Deno.upgradeWebSocket(req)

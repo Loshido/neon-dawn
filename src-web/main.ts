@@ -1,3 +1,5 @@
+const MODE: 'remote' | 'local' = 'remote'
+
 // @ts-types="npm:@types/three/webgpu"
 import { 
     PerspectiveCamera, Scene, WebGPURenderer, 
@@ -20,7 +22,6 @@ import { ui } from './ui.ts';
 import { pass } from 'npm:three/tsl';
 import { smaa } from 'npm:three/examples/jsm/tsl/display/SMAANode.js';
 
-const MODE: 'remote' | 'local' = 'remote'
 document.body.setAttribute('data-mode', MODE)
 
 let camera: PerspectiveCamera;

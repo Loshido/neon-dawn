@@ -70,7 +70,10 @@ const routes: Router = {
     }
 }
 
-Deno.serve((req, info) => {
+Deno.serve({
+    port: 81,
+    hostname: '0.0.0.0'
+}, (req, info) => {
     const url = new URL(req.url)
 
     if(url.pathname in routes) {

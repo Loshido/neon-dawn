@@ -154,7 +154,7 @@ function next(div: Element, name: string, url: string, cb: CB): Element {
     url_p = copy.querySelector('p.url') as HTMLParagraphElement | null
     svg = copy.querySelector('svg') as HTMLElement | null
     if(!name_p || !url_p || !svg) return div
-    name_p.innerText = "Nom du groupe"
+    name_p.innerText = "Group's name"
     url_p.innerText = "http://localhost"
     initialise(copy, cb)
         
