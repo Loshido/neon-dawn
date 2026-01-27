@@ -1,4 +1,7 @@
 {
+    "tasks": {
+        "web": "deno bundle -o ../public/main.js ./main.ts"
+    },
     "compilerOptions": {
         "lib": ["dom", "esnext", "deno.window"]
     },

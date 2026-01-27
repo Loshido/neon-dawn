@@ -1,0 +1,21 @@
+[package]
+name = "neon-dawn"
+version = "0.1.0"
+edition = "2024"
+
+[profile.dev]
+opt-level = 1
+codegen-units = 8
+
+[profile.release]
+lto = true
+strip = true
+opt-level = 3
+panic = 'abort'
+codegen-units = 1
+
+[dependencies]
+axum = "0.8.8"
+serde = { version = "1.0.228", features = ["derive"] }
+tokio = { version = "1.49.0", features = ["rt-multi-thread", "macros", "signal"] }
+tower-http = { version = "0.6.8", features = ["fs"] }
