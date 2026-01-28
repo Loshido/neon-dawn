@@ -1,27 +1,42 @@
-use std::{collections::HashMap, sync::{Arc, RwLock}};
-use axum::{Router, routing::post};
-use crate::{satellite::Orbit, server::serve};
+use std::{collections::HashMap, sync::Arc};
+use axum::{Router, routing::{get, post}};
+use tokio::sync::RwLock;
+use crate::{net::sse::TX, satellite::{Orbit, check_for_crash}, server::serve};
 
 mod server;
 mod satellite;
-mod rest;
+mod events;
+
+mod net;
+
+#[derive(Clone)]
+pub struct Etat {
+    orbit: Orbit,
+    tx: TX
+}
 
 #[tokio::main]
 async fn main() {
     let orbit: Orbit = Arc::new(RwLock::new(HashMap::new()));
+    let tx = net::sse::initialize();
+
+    let etat = Etat { orbit, tx };
+    
+    check_for_crash(etat.clone()).await;
 
     let app = Router::new()
         // client rest routes
-        .route("/orbit/launch", post(rest::launch))
-        .route("/orbit/update", post(rest::update))
-        .route("/orbit/signal", post(rest::signal))
+        .route("/orbit/launch", post(net::rest::launch))
+        .route("/orbit/update", post(net::rest::update))
+        .route("/orbit/signal", post(net::rest::signal))
 
         // client ws routes
-            // websocket to launch, update and signal
+        .route("/ws", get(net::ws::ws_handle))
 
         // monitor routes
+        .route("/listen", get(net::sse::subscribe))
             // sse to broadcast
-        .with_state(orbit);
+        .with_state(etat);
 
     serve(app).await;
 }
