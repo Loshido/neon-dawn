@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 use axum::{Router, routing::{get, post}};
 use tokio::sync::RwLock;
+use tower_http::services::ServeDir;
 use crate::{net::sse::TX, satellite::{Orbit, check_for_crash}, server::serve};
 
 mod server;
@@ -24,6 +25,7 @@ async fn main() {
     
     check_for_crash(etat.clone()).await;
 
+    let fs = ServeDir::new("./public");
     let app = Router::new()
         // client rest routes
         .route("/orbit/launch", post(net::rest::launch))
@@ -35,7 +37,7 @@ async fn main() {
 
         // monitor routes
         .route("/listen", get(net::sse::subscribe))
-            // sse to broadcast
+        .fallback_service(fs)
         .with_state(etat);
 
     serve(app).await;
