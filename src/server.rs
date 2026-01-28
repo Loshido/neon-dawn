@@ -1,8 +1,11 @@
 use std::net::SocketAddr;
 
-use axum::Router;
+use axum::{Router, http::{HeaderName, HeaderValue}};
 #[cfg(unix)]
 use tokio::signal::{self, unix::{signal, SignalKind}};
+use tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer};
+
+use crate::Etat;
 
 async fn shutdown_signal() {
     let ctrl_c = async {
@@ -38,4 +41,18 @@ pub async fn serve(router: Router) {
         .unwrap();
 
     println!("Stopped listening");
+}
+
+pub async fn file_router() -> Router<Etat> {
+    let fs = ServeDir::new("./public");
+    let cache_control = (
+        HeaderName::from_static("Cache-Control"),
+        HeaderValue::from_static("max-age=5184000, immutable, public")
+    );
+
+    let router = Router::new()
+        .fallback_service(fs)
+        .layer(SetResponseHeaderLayer::appending(cache_control.0, cache_control.1));
+
+    router
 }
