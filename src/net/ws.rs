@@ -9,7 +9,7 @@ use crate::{Etat, events::Events, net::sse::broadcast, satellite::Satellite};
 enum IncomingEvent {
     Launch { name: String, color: [u8; 3], citation: String },
     Update { name: Option<String>, color: Option<[u8; 3]> },
-    Signal { position: (i32, i32, i32), rotation: Option<(i32, i32, i32)> }
+    Signal { position: (f32, f32, f32), rotation: Option<(f32, f32, f32)> }
 }
 
 pub async fn ws_handle(

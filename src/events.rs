@@ -5,7 +5,7 @@ use crate::satellite::Satellite;
 #[derive(Clone, Serialize)]
 #[serde(tag = "type")]
 pub enum Events {
-    Position { name: String, position: (i32, i32, i32), rotation: Option<(i32, i32, i32)> },
+    Position { name: String, position: (f32, f32, f32), rotation: Option<(f32, f32, f32)> },
     Launch { name: String, color: [u8; 3], payload: String },
     Update { name: String, color: Option<[u8; 3]>, new_name: Option<String> },
     Crash { name: String },

@@ -30,7 +30,7 @@ pub async fn subscribe(
         .map(|msg| Ok(Event::default().data(msg)));
 
     let welcome = stream::once(async move {
-        Ok(Event::default().event("welcome").data(sync.to_json()))
+        Ok(Event::default().data(sync.to_json()))
     });
 
     let stream = welcome.chain(broadcast);

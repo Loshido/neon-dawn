@@ -8,8 +8,8 @@ pub struct Satellite {
     pub name: String,
     pub color: [u8; 3],
 
-    pub position: (i32, i32, i32),
-    pub rotation: Option<(i32, i32, i32)>,
+    pub position: (f32, f32, f32),
+    pub rotation: Option<(f32, f32, f32)>,
 
     #[serde(skip)]
     instant: Instant
@@ -22,14 +22,14 @@ impl Satellite {
         Self {
             name: name.to_string(),
             color,
-            position: (0, 10, 0),
+            position: (0.0, 10.0, 0.0),
             rotation: None,
 
             instant: Instant::now()
         }
     }
 
-    pub fn update_position(&mut self, position: (i32, i32, i32), rotation: Option<(i32, i32, i32)>) {
+    pub fn update_position(&mut self, position: (f32, f32, f32), rotation: Option<(f32, f32, f32)>) {
         self.position = position;
         if rotation.is_some() {
             self.rotation = rotation;

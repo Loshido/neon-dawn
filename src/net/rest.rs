@@ -76,8 +76,8 @@ pub async fn update(
 
 #[derive(Deserialize)]
 pub struct Signal {
-    position: (i32, i32, i32),
-    rotation: Option<(i32, i32, i32)>
+    position: (f32, f32, f32),
+    rotation: Option<(f32, f32, f32)>
 }
 
 pub async fn signal(
