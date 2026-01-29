@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 use crate::{etat::Etat, events::Events};
 
-const DURATION_UNTIL_CRASHED: Duration = Duration::from_secs(60);
+const DURATION_UNTIL_CRASHED: Duration = Duration::from_secs(60 * 4);
 
 impl Etat {
     async fn expired_satellites(&self) -> Vec<String> {

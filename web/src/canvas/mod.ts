@@ -1,5 +1,5 @@
 
-import { type PerspectiveCamera, type PostProcessing, Raycaster, type WebGPURenderer, type DirectionalLight, Scene } from "three/webgpu"
+import { type PerspectiveCamera, type PostProcessing, Raycaster, type WebGPURenderer, type DirectionalLight, Scene, Mesh } from "three/webgpu"
 import type { OrbitControls } from "three/addons";
 
 import sun from "./objects/sun.ts";
@@ -37,6 +37,7 @@ class Canvas {
     camera: PerspectiveCamera
     postProcess: PostProcessing | null
     scene: Scene
+    globe: Mesh
     renderer: WebGPURenderer
     controls: OrbitControls
     raycast: Raycaster
@@ -47,8 +48,8 @@ class Canvas {
         this.sun = sun()
         this.scene.add(this.sun)
 
-        const globeMesh = globe(this.sun)
-        this.scene.add(globeMesh)
+        this.globe = globe(this.sun)
+        this.scene.add(this.globe)
 
         const atmosphereMesh = atmosphere(this.sun)
         this.scene.add(atmosphereMesh)

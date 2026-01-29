@@ -86,6 +86,8 @@ export default (sun: DirectionalLight) => {
     
     const sphereGeometry = new SphereGeometry(1, 64, 64);
     const globe = new Mesh(sphereGeometry, globeMaterial);
+
+    globe.position.set(0, 0, 0)
     
     return globe;
 }
