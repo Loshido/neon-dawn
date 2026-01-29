@@ -1,6 +1,7 @@
 use serde::Serialize;
 
-use crate::satellite::Satellite;
+use crate::etat::satellite::Satellite;
+
 
 #[derive(Clone, Serialize)]
 #[serde(tag = "type")]

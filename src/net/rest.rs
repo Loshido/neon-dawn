@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 
 use axum::{Json, extract::{ConnectInfo, State}, http::StatusCode, response::{IntoResponse, Response}};
 use serde::Deserialize;
-use crate::{Etat, events::Events, net::sse::broadcast, satellite::Satellite};
+use crate::{Etat, net::sse::broadcast};
 
 #[derive(Deserialize)]
 pub struct LaunchSettings {
@@ -15,23 +15,22 @@ pub async fn launch(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
     State(etat): State<Etat>, 
     Json(settings): Json<LaunchSettings>
-) -> String {
-    let satellite = Satellite::launch(&settings.name, settings.color);
+) -> Result<String, StatusCode> {
     let origin = addr.ip().to_string();
 
-    let mut orbit = etat.orbit.write().await;
-    orbit.insert(origin, satellite);
+    let event = etat
+        .launch(&origin, settings.name.clone(), settings.color, settings.citation)
+        .await
+        .ok();
 
-    let event = Events::Launch {
-        name: settings.name.clone(), 
-        color: settings.color, 
-        payload: settings.citation
-    };
-
-    // Broadcast to everyone that a new satellite launched (with citation)
-    broadcast(&etat.tx, event).await;
-
-    settings.name
+    match event {
+        Some(event) => {
+            broadcast(&etat.tx, event).await;
+        
+            Ok(settings.name)
+        },
+        None => Err(StatusCode::CONFLICT)
+    }
 }
 
 #[derive(Deserialize)]
@@ -47,30 +46,18 @@ pub async fn update(
 ) -> Response {
     let origin = addr.ip().to_string();
 
-    let mut orbit = etat.orbit.write().await;
+    let event = etat
+        .update(&origin, update.name, update.color)
+        .await
+        .ok();
 
-    let satellite= orbit.get_mut(&origin);    
-    match satellite {
-        Some(satellite) => {
-            if let Some(name) = update.name.clone() {
-                satellite.update_name(&name);
-            }
-            if let Some(color) = update.color {
-                satellite.update_color(color);
-            }
-            let event = Events::Update {
-                name: satellite.name.clone(), 
-                color: update.color,
-                new_name: update.name
-            };
+    match event {
+        Some(event) => {
             broadcast(&etat.tx, event).await;
 
-            // 200
             ().into_response()
         },
-        None => 
-            // 404
-            StatusCode::NOT_FOUND.into_response()
+        None => StatusCode::NOT_FOUND.into_response()
     }
 }
 
@@ -87,26 +74,17 @@ pub async fn signal(
 ) -> Response {
     let origin = addr.ip().to_string();
 
-    let mut orbit = etat.orbit.write().await;
+    let event = etat
+        .signal(&origin, signal.position, signal.rotation)
+        .await
+        .ok();
 
-    let satellite= orbit.get_mut(&origin);    
-    match satellite {
-        Some(satellite) => {
-            satellite.update_position(signal.position, signal.rotation);
-
-            // Broadcast to everyone, the satellite' signal
-            let event = Events::Position { 
-                name: satellite.name.clone(), 
-                position: signal.position,
-                rotation: signal.rotation
-            };
+    match event {
+        Some(event) => {
             broadcast(&etat.tx, event).await;
 
-            // 200
             ().into_response()
         },
-        None => 
-            // 404
-            StatusCode::NOT_FOUND.into_response()
+        None => StatusCode::NOT_FOUND.into_response()
     }
 }

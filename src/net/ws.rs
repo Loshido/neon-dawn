@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 use axum::{extract::{ConnectInfo, State, WebSocketUpgrade, ws::WebSocket}, response::IntoResponse};
 use serde::Deserialize;
 
-use crate::{Etat, events::Events, net::sse::broadcast, satellite::Satellite};
+use crate::{Etat, net::sse::broadcast};
 
 #[derive(Deserialize, Clone)]
 #[serde(tag = "type")]
@@ -32,52 +32,15 @@ async fn handle_socket(mut socket: WebSocket, ip: String, etat: Etat) {
             Err(_) => return
         };
         
-        let mut orbit = etat.orbit.write().await;
         let outcoming_event = match incoming_event {
             IncomingEvent::Launch { name, color, citation } => {
-                let satellite = Satellite::launch(&name, color);
-                orbit.insert(ip.clone(), satellite);
-
-                // Broadcast to everyone that a new satellite launched (with citation)
-                let event = Events::Launch {
-                    name: name, 
-                    color, 
-                    payload: citation
-                };
-                Some(event)
+                etat.launch(&ip, name, color, citation).await.ok()
             },
             IncomingEvent::Signal { position, rotation } => {
-                if let Some(satellite) =  orbit.get_mut(&ip) {
-                    satellite.update_position(position, rotation);
-
-                    // Broadcast to everyone, the satellite' signal
-                    let event = Events::Position { 
-                        name: satellite.name.clone(), 
-                        position: position,
-                        rotation: rotation
-                    };
-                    Some(event)
-                } else {
-                    None
-                }
+                etat.signal(&ip, position, rotation).await.ok()
             },
             IncomingEvent::Update { name, color } => {
-                if let Some(satellite) =  orbit.get_mut(&ip) {
-                    if let Some(name) = name.clone() {
-                        satellite.update_name(&name);
-                    }
-                    if let Some(color) = color {
-                        satellite.update_color(color);
-                    }
-                    let event = Events::Update { 
-                        name: satellite.name.clone(), 
-                        color,
-                        new_name: name
-                    };
-                    Some(event)
-                } else {
-                    None
-                }
+                etat.update(&ip, name, color).await.ok()
             }
         };
 

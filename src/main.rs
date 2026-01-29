@@ -1,23 +1,17 @@
 use std::{collections::HashMap, sync::Arc};
 use axum::{Router, routing::{get, post}};
 use tokio::sync::RwLock;
-use crate::{net::sse::TX, satellite::{Orbit, check_for_crash}, server::serve};
+use crate::{etat::{Etat, crash::check_for_crash}, server::serve};
 
 mod server;
-mod satellite;
 mod events;
+mod etat;
 
 mod net;
 
-#[derive(Clone)]
-pub struct Etat {
-    orbit: Orbit,
-    tx: TX
-}
-
 #[tokio::main]
 async fn main() {
-    let orbit: Orbit = Arc::new(RwLock::new(HashMap::new()));
+    let orbit = Arc::new(RwLock::new(HashMap::new()));
     let tx = net::sse::initialize();
 
     let etat = Etat { orbit, tx };

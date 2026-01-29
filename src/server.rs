@@ -44,9 +44,9 @@ pub async fn serve(router: Router) {
 }
 
 pub async fn file_router() -> Router<Etat> {
-    let fs = ServeDir::new("./public");
+    let fs = ServeDir::new("./dist");
     let cache_control = (
-        HeaderName::from_static("Cache-Control"),
+        HeaderName::from_lowercase(b"cache-control").unwrap(),
         HeaderValue::from_static("max-age=5184000, immutable, public")
     );
 

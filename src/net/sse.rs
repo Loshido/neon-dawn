@@ -6,7 +6,7 @@ use futures::{Stream, StreamExt, stream};
 use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
 use std::{convert::Infallible, time::Duration};
-use crate::{Etat, events::Events, satellite::Satellite};
+use crate::{Etat, events::Events, etat::satellite::Satellite};
 
 pub type TX = tokio::sync::broadcast::Sender<String>;
 
