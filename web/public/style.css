@@ -68,7 +68,13 @@ a {
         box-shadow: 0 0 8px 2px #FFF2;
     }
 }
-.links > div {
+
+.links :is(button, a).active > img {
+    background-color: #fff2;
+    filter: brightness(0.8);
+}
+
+.links > #ping {
     width: 12px;
     height: 12px;
     border-radius: 4px;
@@ -80,6 +86,9 @@ a {
 }
 
 @keyframes ping {
+    0% {
+        background-color: #16c07100;
+    }
     75% {
         background-color: #16c071;
     }
@@ -88,9 +97,10 @@ a {
     }
 }
 
-.links :is(button, a).active > img {
-    background-color: #fff2;
-    filter: brightness(0.8);
+
+
+aside:has(#show-satellites:not(.active)) > .satellite {
+    display: none;
 }
 
 .satellite {
