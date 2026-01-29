@@ -1,10 +1,7 @@
-use std::time::{Duration, Instant};
-
-use crate::{etat::satellite::Satellite, events::Events, net::sse::broadcast};
+use crate::{etat::satellite::Satellite, events::Events};
 
 use super::Etat;
 
-const DURATION_UNTIL_CRASHED: Duration = Duration::from_secs(60);
 
 impl Etat {
     pub async fn launch(&self, ip: &String, name: String, color: [u8; 3], citation: String) -> Result<Events, ()> {
@@ -64,35 +61,6 @@ impl Etat {
             Ok(event)
         } else {
             Err(())
-        }
-    }
-
-    async fn expired_satellites(&self) -> Vec<String> {
-        let satellites = self.orbit.read().await;
-        let now = Instant::now();
-        let mut crashed = Vec::new();
-        
-        for (ip, satellite) in satellites.iter() {
-            if now.duration_since(satellite.instant) > DURATION_UNTIL_CRASHED {
-                    crashed.push(ip.clone());
-            }
-        }
-
-        crashed
-    }
-
-    pub async fn remove_expired(&self) {
-        let expired = self.expired_satellites().await;
-        if expired.len() == 0 {
-            return
-        }
-        
-        let mut satellites = self.orbit.write().await;
-        for ip in expired {
-            let satellite = satellites.remove(&ip);
-            if let Some(satellite) = satellite {
-                broadcast(&self.tx, Events::Crash { name: satellite.name }).await;
-            }
         }
     }
 }

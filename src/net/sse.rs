@@ -41,7 +41,3 @@ pub async fn subscribe(
             .text("keep-alive"),
     )
 }
-
-pub(crate) async fn broadcast(tx: &TX, message: Events) -> Option<usize> {
-    tx.send(message.to_json()).ok()
-}

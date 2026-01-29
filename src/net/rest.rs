@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 
 use axum::{Json, extract::{ConnectInfo, State}, http::StatusCode, response::{IntoResponse, Response}};
 use serde::Deserialize;
-use crate::{Etat, net::sse::broadcast};
+use crate::Etat;
 
 #[derive(Deserialize)]
 pub struct LaunchSettings {
@@ -25,7 +25,7 @@ pub async fn launch(
 
     match event {
         Some(event) => {
-            broadcast(&etat.tx, event).await;
+            etat.broadcast(event);
         
             Ok(settings.name)
         },
@@ -53,7 +53,7 @@ pub async fn update(
 
     match event {
         Some(event) => {
-            broadcast(&etat.tx, event).await;
+            etat.broadcast(event);
 
             ().into_response()
         },
@@ -81,7 +81,7 @@ pub async fn signal(
 
     match event {
         Some(event) => {
-            broadcast(&etat.tx, event).await;
+            etat.broadcast(event);
 
             ().into_response()
         },

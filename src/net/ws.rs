@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 use axum::{extract::{ConnectInfo, State, WebSocketUpgrade, ws::WebSocket}, response::IntoResponse};
 use serde::Deserialize;
 
-use crate::{Etat, net::sse::broadcast};
+use crate::Etat;
 
 #[derive(Deserialize, Clone)]
 #[serde(tag = "type")]
@@ -45,7 +45,7 @@ async fn handle_socket(mut socket: WebSocket, ip: String, etat: Etat) {
         };
 
         if let Some(outcoming_event) = outcoming_event {
-            broadcast(&etat.tx, outcoming_event).await;
+            etat.broadcast(outcoming_event);
         }
     }
 }
