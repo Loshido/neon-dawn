@@ -4,23 +4,57 @@
 		<title>🛰️ Mission Neon-Dawn</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <style>
-            body {
-                margin: 0;
-                font-family: Monospace;
-                font-size: 13px;
-                line-height: 24px;
-                overscroll-behavior: none;
-                overflow: hidden;
-                width: 100dvw;
-                height: 100dvh;
-
-                background-color: #000;
-            }
-
-        </style>
+        <link rel="stylesheet" href="/style.css">
 	</head>
 	<body>
+        <aside>
+            <div class="links">
+                <div>
+                </div>
+                <button title="Recentrer sur la terre">
+                    <img src="images/earth.svg" alt="Terre">
+                </button>
+                <button class="active" title="Affichage des satellites">
+                    <img src="images/satellite.svg" alt="Satellites">
+                </button>
+                <button title="Rotation automatique">
+                    <img src="images/rotate.svg" alt="Rotation 3D">
+                </button>
+                <a href="" target="_blank" title="Informations">
+                    <img src="images/info.svg" alt="Informations">
+                </a>
+                <a href="https://github.com/Loshido/neon-dawn" target="_blank" title="Code source">
+                    <img src="images/github.svg" alt="Github">
+                </a>
+            </div>
+            <div class="satellite">
+                <div class="color"><div></div></div>
+                <div class="name">
+                    IE231
+                </div>
+                <div class="actions">
+                    <img src="images/cctv.svg" alt="CCTV">
+                </div>
+            </div>
+            <div class="satellite">
+                <div class="color active"><div></div></div>
+                <div class="name">
+                    IE232
+                </div>
+                <div class="actions">
+                    <img src="images/cctv.svg" alt="CCTV">
+                </div>
+            </div>
+            <div class="satellite">
+                <div class="color"><div></div></div>
+                <div class="name">
+                    IE233
+                </div>
+                <div class="actions">
+                    <img src="images/cctv.svg" alt="CCTV">
+                </div>
+            </div>
+        </aside>
 		<script type="module" src="/src/main.ts"></script>
 	</body>
 </html>
