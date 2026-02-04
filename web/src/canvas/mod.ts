@@ -10,6 +10,7 @@ import runtime from "../runtime/mod"
 import controls from "./objects/controls.ts"
 import camera from "./objects/camera.ts"
 import postprocess from "./objects/postprocess.ts";
+import stars from "./objects/stars";
 
 const POST_PROCESSING = false
 
@@ -32,6 +33,7 @@ export class Canvas {
         this.scene = new Scene()
 
         this.sun = sun()
+        this.scene.add(stars())
         this.scene.add(this.sun)
 
         this.globe = globe(this.sun)

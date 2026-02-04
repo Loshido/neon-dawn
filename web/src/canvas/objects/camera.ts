@@ -5,6 +5,7 @@ export default () => {
     camera.fov = 20
     camera.zoom = 2.0
     camera.position.set( 4.5, 2, 3 );
+    camera.far = 30000
 
     return camera
 }
