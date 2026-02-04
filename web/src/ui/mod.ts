@@ -3,7 +3,6 @@ import Satellite from './satellite'
 const { initialize: initialize_actions } = (await import('./actions'))
 
 interface Callback {
-    toggleRotation(): void,
     focusOnSatellite(name: string): void,
     focusOnEarthView(): void,
     showTraceOfSatellite(name: string, show?: boolean): void,
@@ -29,7 +28,6 @@ export default (parameters: Callback): Listeners => {
             satellites.forEach(s => s.unfocus())
             parameters.focusOnEarthView()
         },
-        toggleRotation: parameters.toggleRotation
     })
 
     const newSatellite = (name: string, color: [number, number, number]) => 

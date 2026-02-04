@@ -10,28 +10,35 @@
 const ws = new WebSocket('http://localhost/ws')
 
 let interval: number | undefined
+let t = 0;
 ws.addEventListener('open', _ => {
     const launch = {
         type: "Launch",
         name: "IE250",
-        color: [250, 250, 250],
+        color: [0, 250, 250],
         citation: "Deno on his way"
     }
 
     ws.send(JSON.stringify(launch))
 
     interval = setInterval(() => {
+        t += 5
         const position = {
             type: "Signal",
             position: [
-                Math.floor(Math.random() * 10E6),
-                Math.floor(Math.random() * 10E6),
-                Math.floor(Math.random() * 10E6),
+                1.5 * Math.cos(t / 100),
+                1.5 * Math.sin(t / 100),
+                1.5 * Math.sin(t / 50),
+            ],
+            rotation: [
+                Math.PI * Math.cos(t / 100) ,
+                Math.PI * Math.cos(t / 100) ,
+                Math.PI * Math.cos(t / 100) 
             ]
         }
 
         ws.send(JSON.stringify(position))
-    }, 1000);
+    }, 333);
 })
 
 ws.addEventListener('close', _ => clearInterval(interval))

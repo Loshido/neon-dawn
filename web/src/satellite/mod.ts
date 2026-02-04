@@ -1,11 +1,18 @@
 import { BufferAttribute, BufferGeometry, DynamicDrawUsage, Line, LineBasicMaterial, Material, Scene, type Object3D } from "three/webgpu"
 import { chargerSatellite } from "../canvas/models"
+import { TweenUpdateRegister } from "~/runtime/tween"
+import { Tween } from "@tweenjs/tween.js"
+
+type vec3<T> = [T, T, T]
+type vec6<T> = [T, T, T, T, T, T]
 
 export class SatelliteMesh {
     name: string
-    mesh?: Object3D<any>
     line: Line
-
+    mesh?: Object3D<any>
+    
+    private tween?: Tween
+    private tween_duration: number = 333
     private positions: Float32Array
     private currentPointCount: number = 0
     private maxPoints: number
@@ -20,6 +27,16 @@ export class SatelliteMesh {
             this.mesh = mesh
             scene.add(this.mesh)
             scene.add(this.line)
+
+            this.tween = new Tween([0, 0, 0, 0, 0, 0])
+                .onUpdate(async ([ x, y, z, rx, ry, rz ]) => {
+                    const mesh = await this.waitForMesh()
+
+                    mesh.position.set(x, y, z)
+                    mesh.rotation.set(rx, ry, rz)
+                })
+                .duration(this.tween_duration)
+            TweenUpdateRegister(this.tween)
         })
     }
 
@@ -30,13 +47,22 @@ export class SatelliteMesh {
         return this.mesh
     }
 
-    async update(position: [number, number, number]) {
-        (await this.waitForMesh()).position.fromArray(position)
-        this.newPoint(position)
+    async update(position: [number, number, number], rotation?: [number, number, number]) {
+        if(!this.tween) return
+        this.tween.stop()
+
+        const default_rotation: vec3<number> = rotation 
+            || this.mesh?.rotation.toArray().slice(0, 3) as vec3<number> 
+            || [0, 0, 0]
+        this.tween.to(position.concat(default_rotation) as vec6<number>)
+        this.tween.startFromCurrentValues()
+        
+        setTimeout(() => this.newPoint(position), this.tween_duration * 3)
     }
 
     toggleTrace(force?: boolean) {
-        if(force === undefined) this.line.visible = !this.line.visible
+        if(force === undefined) 
+            this.line.visible = !this.line.visible
         else this.line.visible = force
     }
 

@@ -6,6 +6,7 @@ import sun from "./objects/sun.ts";
 const renderer = (await import('./objects/renderer')).default
 const globe = (await import('./objects/globe')).default
 const atmosphere = (await import('./objects/atmosphere')).default
+import runtime from "../runtime/mod"
 import controls from "./objects/controls.ts"
 import camera from "./objects/camera.ts"
 import postprocess from "./objects/postprocess.ts";
@@ -13,27 +14,12 @@ import postprocess from "./objects/postprocess.ts";
 const POST_PROCESSING = false
 
 export default () => {
-    const canvas = new Canvas(c => ((time: number) => {
-        if(POST_PROCESSING && c.postProcess) {
-            c.postProcess.render()
-        } else {
-            c.renderer.render(c.scene, c.camera)
-        }
-
-        const radius = 5;
-        const speed = 0.00005;
-        
-        c.sun.position.x = Math.cos(time * speed) * radius;
-        c.sun.position.z = Math.sin(time * speed) * radius;
-        c.sun.position.y = Math.sin(time * speed * 0.5) * radius * 0.4;
-        
-        c.sun.target.position.set(0, 0, 0);
-        c.sun.target.updateMatrixWorld();
-    }))
+    const canvas = new Canvas(runtime)
 
     return canvas
 }
-class Canvas {
+
+export class Canvas {
     camera: PerspectiveCamera
     postProcess: PostProcessing | null
     scene: Scene
@@ -42,7 +28,7 @@ class Canvas {
     controls: OrbitControls
     raycast: Raycaster
     sun: DirectionalLight
-    constructor(make_animate: (canvas: Canvas) => ((time: number) => void)) {
+    constructor(runtime: ((canvas: Canvas, time: number) => void)[]) {
         this.scene = new Scene()
 
         this.sun = sun()
@@ -55,7 +41,9 @@ class Canvas {
         this.scene.add(atmosphereMesh)
 
         this.camera = camera()
-        this.renderer = renderer(make_animate(this))
+        this.renderer = renderer((time: number) => {
+            runtime.forEach(update => update(this, time))
+        })
         this.controls = controls(this.camera, this.renderer.domElement)
         this.raycast = new Raycaster()
 
@@ -80,6 +68,4 @@ class Canvas {
     onKeyDown(_event: KeyboardEvent) {
 
     }
-
-    
 }

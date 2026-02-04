@@ -30,7 +30,7 @@ export default (sun: DirectionalLight) => {
     const cloudOffset = time.mul(cloudSpeed)
 
     const baseUV = uv()
-    const cloudUV = baseUV.add(vec3(cloudOffset, 0, 0))
+    const cloudUV = baseUV.add(vec3(cloudOffset, 0, 0)).fract()
 
     const dayColor = texture(dayTexture, uv());
     const nightColor = texture(nightTexture, uv());

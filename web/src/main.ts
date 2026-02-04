@@ -8,9 +8,6 @@ const ctx = canvas()
 const meshes: SatelliteMesh[] = []
 
 const { onPing, onRecolor, onRename, onSatelliteCrashed, onSatelliteLaunched } = ui({
-    toggleRotation() {
-        console.log('rotation')
-    },
     focusOnSatellite(name: string) {
         const target = meshes.find(m => m.name === name)?.mesh
         if(target) ctx.controls.target = target.position
@@ -51,7 +48,7 @@ sse({
             }
             case 'Position':
                 const s = meshes.find(m => m.name === event.name)
-                if(s) s.update(event.position)
+                if(s) s.update(event.position, event.rotation ?? undefined)
                 // todo: rotation
                 break;
             case 'Sync':
