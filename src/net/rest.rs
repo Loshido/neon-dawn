@@ -1,6 +1,6 @@
-use axum::{Extension, Json, extract::State, http::StatusCode, response::{IntoResponse, Response}};
+use axum::{Extension, Json, extract::State, http::{HeaderMap, StatusCode}, response::{IntoResponse, Response}};
 use serde::Deserialize;
-use crate::{Etat, server::ip::ClientIp};
+use crate::{Etat, headers, server::ip::ClientIp};
 
 #[derive(Deserialize)]
 pub struct LaunchSettings {
@@ -13,7 +13,7 @@ pub async fn launch(
     Extension(ip): Extension<ClientIp>,
     State(etat): State<Etat>, 
     Json(settings): Json<LaunchSettings>
-) -> Result<String, StatusCode> {
+) -> Result<(HeaderMap, String), (HeaderMap, StatusCode)> {
     let origin = ip.to_string();
 
     let event = etat
@@ -21,13 +21,16 @@ pub async fn launch(
         .await
         .ok();
 
+    let headers = headers! {
+        "access-control-allow-origin" => "*"
+    };
     match event {
         Some(event) => {
             etat.broadcast(event);
         
-            Ok(settings.name)
+            Ok((headers, settings.name))
         },
-        None => Err(StatusCode::CONFLICT)
+        None => Err((headers, StatusCode::CONFLICT))
     }
 }
 
@@ -49,13 +52,16 @@ pub async fn update(
         .await
         .ok();
 
+    let headers = headers! {
+        "access-control-allow-origin" => "*"
+    };
     match event {
         Some(event) => {
             etat.broadcast(event);
 
-            ().into_response()
+            headers.into_response()
         },
-        None => StatusCode::NOT_FOUND.into_response()
+        None => (headers, StatusCode::NOT_FOUND).into_response()
     }
 }
 
@@ -77,12 +83,15 @@ pub async fn signal(
         .await
         .ok();
 
+    let headers = headers! {
+        "access-control-allow-origin" => "*"
+    };
+
     match event {
         Some(event) => {
             etat.broadcast(event);
-
-            ().into_response()
+            headers.into_response()
         },
-        None => StatusCode::NOT_FOUND.into_response()
+        None => (headers, StatusCode::NOT_FOUND).into_response()
     }
 }

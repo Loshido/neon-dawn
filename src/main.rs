@@ -6,8 +6,8 @@ use crate::{etat::{Etat, crash::check_for_crash}, server::serve};
 mod server;
 mod events;
 mod etat;
-
 mod net;
+mod macros;
 
 #[tokio::main]
 async fn main() {

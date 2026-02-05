@@ -1,24 +1,22 @@
 use axum::{
-    extract::State,
-    response::sse::{Event, Sse}
+    extract::State, http::HeaderMap, response::sse::{Event, Sse}
 };
 use futures::{Stream, StreamExt, stream};
 use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
 use std::{convert::Infallible, time::Duration};
-use crate::{Etat, events::Events, etat::satellite::Satellite};
+use crate::{Etat, etat::satellite::Satellite, events::Events, headers};
 
 pub type TX = tokio::sync::broadcast::Sender<String>;
 
 pub fn initialize() -> TX {
     let (tx, _rx) = broadcast::channel(100);
-
     tx
 }
 
 pub async fn subscribe(
     State(etat): State<Etat>,
-) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+) -> (HeaderMap, Sse<impl Stream<Item = Result<Event, Infallible>>>) {
     let orbit = etat.orbit.read().await;
 
     let satellites: Vec<Satellite> = orbit.values().cloned().collect();
@@ -35,9 +33,16 @@ pub async fn subscribe(
 
     let stream = welcome.chain(broadcast);
 
-    Sse::new(stream).keep_alive(
-        axum::response::sse::KeepAlive::new()
-            .interval(Duration::from_secs(5))
-            .text("keep-alive"),
+    let headers = headers! {
+        "access-control-allow-origin" => "*"
+    };
+
+    (
+        headers,
+        Sse::new(stream).keep_alive(
+            axum::response::sse::KeepAlive::new()
+                .interval(Duration::from_secs(5))
+                .text("keep-alive"),
+        )
     )
 }

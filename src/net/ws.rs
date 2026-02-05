@@ -1,4 +1,4 @@
-use axum::{Extension, extract::{State, WebSocketUpgrade, ws::WebSocket}, response::IntoResponse};
+use axum::{Extension, extract::{State, WebSocketUpgrade, ws::WebSocket}, response::Response};
 use serde::Deserialize;
 
 use crate::{Etat, server::ip::ClientIp};
@@ -15,10 +15,14 @@ pub async fn ws_handle(
     ws: WebSocketUpgrade,
     State(etat): State<Etat>,
     Extension(ip): Extension<ClientIp>
-) -> impl IntoResponse {
+) -> Response {
     let ip = ip.to_string();
+    let mut response = ws.on_upgrade(move |socket| handle_socket(socket, ip, etat));
 
-    ws.on_upgrade(move |socket| handle_socket(socket, ip, etat))
+    let headers = response.headers_mut();
+    headers.insert("access-control-allow-origin", "*".parse().unwrap());
+
+    response
 }
 
 async fn handle_socket(mut socket: WebSocket, ip: String, etat: Etat) {
