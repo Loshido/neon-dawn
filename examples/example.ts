@@ -1,12 +1,11 @@
-// deno -A main.ts
-// bun main.ts
 
+/* This piece allows to listen for incoming events */
 // const eventSource = new EventSource("http://localhost/listen")
-
 // eventSource.addEventListener('open', _ => console.log('open'))
 // eventSource.addEventListener('message', e => console.log(e.data))
 // eventSource.addEventListener('error', console.log)
 
+/* This piece allows to send events to the hub (earth) */
 const ws = new WebSocket('http://localhost/ws')
 
 let interval: number | undefined

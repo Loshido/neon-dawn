@@ -1,5 +1,5 @@
 use std::{collections::HashMap, sync::Arc};
-use axum::{Router, routing::{get, post}};
+use axum::{Router, middleware, routing::{get, post}};
 use tokio::sync::RwLock;
 use crate::{etat::{Etat, crash::check_for_crash}, server::serve};
 
@@ -26,10 +26,11 @@ async fn main() {
 
         // client ws routes
         .route("/ws", get(net::ws::ws_handle))
+        .layer(middleware::from_fn(server::ip::middleware))
 
         // monitor routes
         .route("/listen", get(net::sse::subscribe))
-        .merge(server::file_router().await)
+        .merge(server::files::router().await)
         .with_state(etat);
 
     serve(app).await;

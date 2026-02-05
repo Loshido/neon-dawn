@@ -1,8 +1,6 @@
-use std::net::SocketAddr;
-
-use axum::{Json, extract::{ConnectInfo, State}, http::StatusCode, response::{IntoResponse, Response}};
+use axum::{Extension, Json, extract::State, http::StatusCode, response::{IntoResponse, Response}};
 use serde::Deserialize;
-use crate::Etat;
+use crate::{Etat, server::ip::ClientIp};
 
 #[derive(Deserialize)]
 pub struct LaunchSettings {
@@ -12,11 +10,11 @@ pub struct LaunchSettings {
 }
 
 pub async fn launch(
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    Extension(ip): Extension<ClientIp>,
     State(etat): State<Etat>, 
     Json(settings): Json<LaunchSettings>
 ) -> Result<String, StatusCode> {
-    let origin = addr.ip().to_string();
+    let origin = ip.to_string();
 
     let event = etat
         .launch(&origin, settings.name.clone(), settings.color, settings.citation)
@@ -40,11 +38,11 @@ pub struct Update {
 }
 
 pub async fn update(
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    Extension(ip): Extension<ClientIp>,
     State(etat): State<Etat>, 
     Json(update): Json<Update>
 ) -> Response {
-    let origin = addr.ip().to_string();
+    let origin = ip.to_string();
 
     let event = etat
         .update(&origin, update.name, update.color)
@@ -68,11 +66,11 @@ pub struct Signal {
 }
 
 pub async fn signal(
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    Extension(ip): Extension<ClientIp>,
     State(etat): State<Etat>, 
     Json(signal): Json<Signal>
 ) -> Response {
-    let origin = addr.ip().to_string();
+    let origin = ip.to_string();
 
     let event = etat
         .signal(&origin, signal.position, signal.rotation)

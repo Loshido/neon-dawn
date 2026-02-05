@@ -6,11 +6,11 @@ import sun from "./objects/sun.ts";
 const renderer = (await import('./objects/renderer')).default
 const globe = (await import('./objects/globe')).default
 const atmosphere = (await import('./objects/atmosphere')).default
+const stars = (await import('./objects/stars')).default
 import runtime from "../runtime/mod"
 import controls from "./objects/controls.ts"
 import camera from "./objects/camera.ts"
 import postprocess from "./objects/postprocess.ts";
-import stars from "./objects/stars";
 
 const POST_PROCESSING = false
 

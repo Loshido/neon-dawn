@@ -1,8 +1,7 @@
-use std::net::SocketAddr;
-use axum::{extract::{ConnectInfo, State, WebSocketUpgrade, ws::WebSocket}, response::IntoResponse};
+use axum::{Extension, extract::{State, WebSocketUpgrade, ws::WebSocket}, response::IntoResponse};
 use serde::Deserialize;
 
-use crate::Etat;
+use crate::{Etat, server::ip::ClientIp};
 
 #[derive(Deserialize, Clone)]
 #[serde(tag = "type")]
@@ -15,9 +14,9 @@ enum IncomingEvent {
 pub async fn ws_handle(
     ws: WebSocketUpgrade,
     State(etat): State<Etat>,
-    ConnectInfo(addr): ConnectInfo<SocketAddr>
+    Extension(ip): Extension<ClientIp>
 ) -> impl IntoResponse {
-    let ip = addr.ip().to_string();
+    let ip = ip.to_string();
 
     ws.on_upgrade(move |socket| handle_socket(socket, ip, etat))
 }

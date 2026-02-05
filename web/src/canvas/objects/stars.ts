@@ -1,4 +1,4 @@
-import { instanceIndex, Fn, vec3, range, hash, mod, time, sin, positionLocal } from "three/tsl";
+const { instanceIndex, Fn, vec3, range, hash, mod, time, sin, positionLocal } = await import("three/tsl")
 import { AdditiveBlending, InstancedMesh, MeshBasicNodeMaterial, SphereGeometry } from "three/webgpu";
 
 const RADIUS = 10000;
