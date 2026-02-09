@@ -6,5 +6,13 @@ export default defineConfig({
         alias: {
             "~": path.resolve(__dirname, "./src")
         }
+    },
+    build: {
+        rolldownOptions: {
+            input: {
+                index: "./index.html",
+                helper: "./helper/index.html"
+            }
+        }
     }
 })
