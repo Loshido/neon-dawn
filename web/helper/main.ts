@@ -1,6 +1,8 @@
+import { computeDesiredPage, setupSearchParams } from './navigation'
+
 const main = document.querySelector('main') as HTMLDivElement | null
-type Page = 'introduction' | 'objectifs' | 'launch' | 'update' |  'signal' | 'ws' | 'listen'
-const pages_id = ['introduction', 'objectifs', 'launch', 'update',  'signal', 'ws', 'listen']
+export type Page = 'introduction' | 'objectifs' | 'launch' | 'update' |  'signal' | 'ws' | 'listen'
+export const pages_id = ['introduction', 'objectifs', 'launch', 'update',  'signal', 'ws', 'listen']
 
 // payload given to pages constructor
 export interface Payload {
@@ -10,7 +12,7 @@ export interface Payload {
 // pages' id along with their constructor
 const pages: Record<Page, null | Promise<any & { default: (payload: Payload) => Promise<void> }>> = {
     introduction: null,
-    objectifs: null,
+    objectifs: import('./setup/objectifs'),
     launch: import('./setup/launch'),
     update: import('./setup/update'),
     signal: import('./setup/signal'),
@@ -18,17 +20,9 @@ const pages: Record<Page, null | Promise<any & { default: (payload: Payload) => 
     listen: import('./setup/listen')
 }
 
-// parse the hash and checks if it is a page
-function parseHash(hash: string) {
-    const id = hash.slice(1)
-    if(pages_id.includes(id)) {
-        return id as Page
-    }
-    return undefined
-}
 
 // shows the page's template on the document
-async function showTemplate(id: Page) {
+export async function showTemplate(id: Page) {
     if(!main) throw new Error('No main in the page')
     const template = document.getElementById(id + '-template') as HTMLTemplateElement | null
     if(!template) throw new Error('No template for ' + id)
@@ -42,7 +36,7 @@ async function showTemplate(id: Page) {
     }
 
     if(!document.startViewTransition) transform()
-    else document.startViewTransition(transform)
+    else await document.startViewTransition(transform).finished
 
     if(pages[id] !== null) (await pages[id]).default({
         async navigate(id: Page) {
@@ -50,6 +44,8 @@ async function showTemplate(id: Page) {
         },
     })
 
+    if(id !== 'introduction') location.hash = id
+    else location.hash = ''
     localStorage.setItem('last-page', id)
 }
 
@@ -72,18 +68,7 @@ Object.keys(pages)
     .filter(div => !!div)
     .forEach(page => page.addEventListener('click', () => showTemplate(page.id as Page)))
 
-// handles hash navigation
-const hash = parseHash(location.hash)
-window.addEventListener('hashchange', e => {
-    const id = parseHash(new URL(e.newURL).hash)
-    if(!id) return
+setupSearchParams()
 
-    showTemplate(id)
-}) 
-
-// handles page navigation
-const lastPage = localStorage.getItem('last-page') as Page | null
-
-// initializes the page
-const target: Page = hash || lastPage || 'introduction'
+const target = computeDesiredPage()
 showTemplate(target)

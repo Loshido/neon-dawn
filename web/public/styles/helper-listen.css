@@ -1,0 +1,36 @@
+#listen-active .actions > button {
+    outline: unset;
+    border: unset;
+    padding: 8px 12px;
+    cursor: pointer;
+
+    font-family: unset;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: inherit;
+
+    transition:
+        background 0.3s ease,
+        color 0.3s ease;
+
+    --start: hsl(from var(--green) h s l / 0.2);
+    --start-active: hsl(from var(--green) h s l / 0.4);
+    --start-active-hover: hsl(from var(--green) h s l / 0.6);
+    --stop: hsl(from var(--pink) h s l / 0.2);
+    --stop-active: hsl(from var(--pink) h s l / 0.4);
+    --stop-active-hover: hsl(from var(--pink) h s l / 0.6);
+
+    --c: var(--start);
+    background-color: var(--c);
+
+    &:not(.active) {
+        color: #fff4;
+    }
+
+    &#listen-start { --c: var(--start); }
+    &#listen-stop { --c: var(--stop); }
+    &#listen-start.active { --c: var(--start-active); }
+    &#listen-stop.active { --c: var(--stop-active); }
+    &#listen-start.active:hover { --c: var(--start-active-hover); }
+    &#listen-stop.active:hover { --c: var(--stop-active-hover); }
+}

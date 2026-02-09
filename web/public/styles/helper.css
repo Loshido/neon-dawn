@@ -1,4 +1,10 @@
+@font-face {
+    font-family: "Inter";
+    src: url(/Inter.ttf);
+}
+
 * {
+    font-family: "Inter";
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -7,6 +13,29 @@
 a {
     text-decoration: unset;
     color: inherit;
+}
+
+span.todo {
+    font-size: .7rem;
+    font-weight: 700;
+    padding: 2px 4px;
+    border-radius: 4px;
+    user-select: none;
+    background-color: rgb(194, 254, 12);
+    color: #000;
+
+    width: fit-content;
+    height: fit-content;
+}
+
+li {
+    list-style-type: square;
+    list-style-position: inside;
+    margin-left: 8px;
+}
+
+body.embedded .link-to-simulation {
+    display: none !important;
 }
 
 :root{
@@ -34,6 +63,19 @@ body{
         & aside {
             display: none;
         }
+    }
+}
+
+@media (width < 1000px) {
+    body {
+        gap: 8px;
+        padding: 16px;
+
+        display: flex;
+        flex-direction: column;
+    }
+    .link-to-simulation {
+        display: none !important;
     }
 }
 
@@ -142,48 +184,11 @@ main {
     & > div {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         gap: 12px;
         align-items: center;
     }
     & > :is(h4, div) {
         margin: 16px 0;
-    }
-}
-
-#listen-active {
-    .actions > button {
-        outline: unset;
-        border: unset;
-        padding: 8px 12px;
-        cursor: pointer;
-
-        font-family: unset;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: inherit;
-
-        transition: background .3s ease, color .3s ease;
-        &:not(.active) {
-            color: #FFF4;
-        }
-    
-        &#listen-start {
-            background-color: hsl(from var(--green) h s l / 0.2);
-        }
-        &#listen-stop {
-            background-color: hsl(from var(--pink) h s l / 0.2);
-        }
-        &#listen-start.active {
-            background-color: hsl(from var(--green) h s l / 0.4);
-        }
-        &#listen-stop.active {
-            background-color: hsl(from var(--pink) h s l / 0.4);
-        }
-        &#listen-start.active:hover {
-            background-color: hsl(from var(--green) h s l / 0.6);
-        }
-        &#listen-stop.active:hover {
-            background-color: hsl(from var(--pink) h s l / 0.6);
-        }
     }
 }
