@@ -32,12 +32,13 @@ export async function showTemplate(id: Page) {
         main.innerHTML = ''
         main.append(clone)
         main.id = id + '-active'
-        toggleActive(id)
     }
-
+    
+    toggleActive(id)
     if(!document.startViewTransition) transform()
     else await document.startViewTransition(transform).finished
 
+    
     if(pages[id] !== null) (await pages[id]).default({
         async navigate(id: Page) {
             await showTemplate(id)

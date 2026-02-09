@@ -34,8 +34,17 @@ li {
     margin-left: 8px;
 }
 
-body.embedded .link-to-simulation {
-    display: none !important;
+body.embedded {
+    background: transparent;
+    & .hide-embed {
+        display: none !important;
+    }
+    & .show-embed {
+        display: block;
+    }
+}
+.show-embed {
+    display: none;
 }
 
 :root{
@@ -46,6 +55,7 @@ body.embedded .link-to-simulation {
 
 @view-transition {
     navigation: auto;
+    types: slide, forwards;
 }
 
 body{
