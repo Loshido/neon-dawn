@@ -43,6 +43,7 @@ body.embedded {
         display: block;
     }
 }
+
 .show-embed {
     display: none;
 }

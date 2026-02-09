@@ -1,4 +1,5 @@
 import { computeDesiredPage, setupSearchParams } from './navigation'
+import './styles/helper.css'
 
 const main = document.querySelector('main') as HTMLDivElement | null
 export type Page = 'introduction' | 'objectifs' | 'launch' | 'update' |  'signal' | 'ws' | 'listen'

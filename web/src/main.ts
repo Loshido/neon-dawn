@@ -1,4 +1,5 @@
 import { SatelliteMesh } from './satellite/mod'
+import './style.css'
 
 const canvas = (await import('./canvas/mod')).default
 const ui = (await import('./ui/mod')).default

@@ -1,4 +1,5 @@
 import type { Payload } from "../main"
+import '../styles/helper-listen.css'
 
 export default async (payload: Payload) => {
     const start = document.getElementById('listen-start') as HTMLButtonElement | null
