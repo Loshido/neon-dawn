@@ -130,5 +130,6 @@ export default async (payload: Payload) => {
         .forEach(el => el.addEventListener('click', () => el.classList.toggle('active')))
     
     const parent = document.querySelector('div.objectifs') as HTMLDivElement
-    parent.append(...objectifs.map(createObjectif))
+    objectifs.map(createObjectif).forEach((obj, i) => 
+        setTimeout(() => parent.append(obj), 25 * i))
 }

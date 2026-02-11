@@ -36,3 +36,8 @@ export function computeDesiredPage(): Page {
 
     return hash || lastPage || 'introduction'
 }
+
+export async function transition(transform: () => void) {
+    if(!document.startViewTransition) transform()
+    else await document.startViewTransition(transform).finished
+}

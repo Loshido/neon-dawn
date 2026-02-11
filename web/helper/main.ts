@@ -1,4 +1,4 @@
-import { computeDesiredPage, setupSearchParams } from './navigation'
+import { computeDesiredPage, setupSearchParams, transition } from './navigation'
 import './styles/helper.css'
 
 const main = document.querySelector('main') as HTMLDivElement | null
@@ -21,7 +21,7 @@ const pages: Record<Page, null | Promise<any & { default: (payload: Payload) => 
     listen: import('./setup/listen')
 }
 
-
+let currentPage: Page
 // shows the page's template on the document
 export async function showTemplate(id: Page) {
     if(!main) throw new Error('No main in the page')
@@ -36,6 +36,10 @@ export async function showTemplate(id: Page) {
     }
     
     toggleActive(id)
+    currentPage === 'introduction' || id === 'introduction' 
+        ? await transition(transform) 
+        : transform()
+
     if(!document.startViewTransition) transform()
     else await document.startViewTransition(transform).finished
 
@@ -49,6 +53,7 @@ export async function showTemplate(id: Page) {
     if(id !== 'introduction') location.hash = id
     else location.hash = ''
     localStorage.setItem('last-page', id)
+    currentPage = id
 }
 
 // highlights current active page on the side menu
