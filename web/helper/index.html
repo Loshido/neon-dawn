@@ -66,25 +66,31 @@
         </p>
 
         <h4>
-            Compétences à acquérir
+            Compétences à acquérir avec les objectifs
         </h4>
-        <p>
-            <span class="todo">todo</span>
-        </p>
-        <!-- <ul>
+        <ul>
             <li>
-                Compétence 1
+                Comprendre les requêtes HTTP
             </li>
             <li>
-                Compétence 2
+                Modéliser des trajectoires ou des comportements complexes
             </li>
             <li>
-                Compétence 3
+                Mettre en place des mises à jour en temps réel (WebSocket / SSE)
             </li>
             <li>
-                Compétence 4
+                Créer des interfaces utilisateur pour contrôler et visualiser des données
             </li>
-        </ul> -->
+            <li>
+                Traiter et interpréter des données de position, vitesse, etc.
+            </li>
+            <li>
+                Apprendre et expérimenter par soi-même, sans assistance constante.
+            </li>
+            <li>
+                Créer des graphiques et des tableaux de bord pour analyser des comportements.
+            </li>
+        </ul>
 
         <h4>Prêt à commencer?</h4>
         <div>
@@ -133,7 +139,7 @@
         <p>
             Les possibilités sont infinies, <a 
                 href="https://github.com/Loshido/neon-dawn/issues/new" target="_blank">
-                vous pouvez en proposer
+                vous pouvez proposer des objectifs
             </a>
         </p>
         <hr>
@@ -145,76 +151,8 @@
             <!-- Tu vas réussir -->
             <button class="lvl lvl-4">Expert</button>
         </div>
-        <div class="objectifs">
-            <div data-lvl="0">
-                <h3>
-                    Titre de l'objectif
-                </h3>
-                <p>
-                    Description de l'objectif qui peut-être longue.
-                </p>
-            </div>
-            <div data-lvl="1">
-                <h3>
-                    Titre de l'objectif
-                </h3>
-                <p>
-                    Description de l'objectif qui peut-être longue.
-                </p>
-            </div>
-            <div data-lvl="2">
-                <h3>
-                    Titre de l'objectif
-                </h3>
-                <p>
-                    Description de l'objectif mais qui peut varier en fonction de l'objectif.
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                    Imagine la description est encore plus longue?
-                </p>
-            </div>
-            <div data-lvl="3">
-                <h3>
-                    Titre de l'objectif
-                </h3>
-                <p>
-                    Description de l'objectif qui peut-être longue.
-                </p>
-            </div>
-            <div data-lvl="3">
-                <h3>
-                    Titre de l'objectif
-                </h3>
-                <p>
-                    Description de l'objectif qui peut-être longue.
-                </p>
-            </div>
-            <div data-lvl="4">
-                <h3>
-                    Titre de l'objectif
-                </h3>
-                <p>
-                    Description de l'objectif qui peut-être longue.
-                </p>
-            </div>
-            <div data-lvl="4">
-                <h3>
-                    Titre de l'objectif
-                </h3>
-                <p>
-                    Description de l'objectif qui peut-être longue.
-                </p>
-            </div>
-        </div>
-        <span class="todo">todo</span>
+        <div class="objectifs"></div>
+        <span class="todo">to improve</span>
     </template>
     <template id="launch-template">
         <h1 data-post>
@@ -225,7 +163,45 @@
             Lancer un satellite en orbite.
         </p>
         <hr>
-        <span class="todo">todo</span>
+        <form>
+            <label for="satellite-name">
+                <p>Nom du satellite<sup>*</sup> <span>string</span></p>
+                <input type="text" name="name" id="satellite-name"
+                    placeholder="IE203">
+            </label>
+            <label for="satellite-color">
+                <p>Couleur du satellite<sup>*</sup> <span>[number, number, number]</span></p>
+                <input type="color" name="color" id="satellite-color" value="#FF0000">
+            </label>
+            <label for="satellite-payload">
+                <p>Citation<sup>*</sup> <span>string</span></p>
+                <input type="text" name="payload" id="satellite-payload"
+                    placeholder="Jusqu'à l'infini et au delà!">
+            </label>
+        </form>
+        <button type="submit">
+            Lancement
+        </button>
+
+        <p id="satellite-error" style="display: none;">
+
+        </p>
+
+        <div id="satellite-output">
+            <section>
+                <h3>Requête envoyée</h3>
+                <pre id="satellite-in">
+    
+                </pre>
+            </section>
+
+            <section>
+                <h3>Réponse reçue</h3>
+                <pre id="satellite-out">
+
+                </pre>
+            </section>
+        </div>
     </template>
     <template id="update-template">
         <h1 data-post>
@@ -236,7 +212,40 @@
             Modifier le satellite en orbite.
         </p>
         <hr>
-        <span class="todo">todo</span>
+        <form>
+            <label for="satellite-name">
+                <p>Nouveau nom du satellite <span>string</span></p>
+                <input type="text" name="name" id="satellite-name"
+                    placeholder="IE204">
+            </label>
+            <label for="satellite-color">
+                <p>Nouvelle couleur du satellite <span>[number, number, number]</span></p>
+                <input type="color" name="color" id="satellite-color" value="#FF11CC">
+            </label>
+        </form>
+        <button type="submit">
+            Mettre à jour
+        </button>
+
+        <p id="satellite-error" style="display: none;">
+
+        </p>
+
+        <div id="satellite-output">
+            <section>
+                <h3>Requête envoyée</h3>
+                <pre id="satellite-in">
+    
+                </pre>
+            </section>
+
+            <section>
+                <h3>Réponse reçue</h3>
+                <pre id="satellite-out">
+
+                </pre>
+            </section>
+        </div>
     </template>
     <template id="signal-template">
         <h1 data-post>
@@ -247,7 +256,41 @@
             Signaler la nouvelle position du satellite.
         </p>
         <hr>
-        <span class="todo">todo</span>
+        <form>
+            <label for="satellite-position">
+                <p>Position<sup>*</sup> <span>[number, number, number]</span></p>
+                <input type="text" name="position" id="satellite-position"
+                    placeholder="[0.2, 2.3, -1.3]">
+            </label>
+            <label for="satellite-rotation" title="Euler">
+                <p>Rotation <span>[number, number, number]</span></p>
+                <input type="text" name="rotation" id="satellite-rotation"
+                    placeholder="[3.14, 0.0, 0.0]">
+            </label>
+        </form>
+        <button type="submit">
+            Signaler
+        </button>
+
+        <p id="satellite-error" style="display: none;">
+
+        </p>
+
+        <div id="satellite-output">
+            <section>
+                <h3>Requête envoyée</h3>
+                <pre id="satellite-in">
+    
+                </pre>
+            </section>
+
+            <section>
+                <h3>Réponse reçue</h3>
+                <pre id="satellite-out">
+
+                </pre>
+            </section>
+        </div>
     </template>
     <template id="ws-template">
         <h1 data-get>

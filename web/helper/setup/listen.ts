@@ -7,7 +7,7 @@ export default async (payload: Payload) => {
     const output = document.getElementById('listen-output') as HTMLDivElement | null
 
     if(!start || !stop || !output) 
-        throw new Error('listen template did\'nt load')
+        throw "listen template didn't load"
 
     let sse: EventSource | null = null
     start.addEventListener('click', () => {

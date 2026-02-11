@@ -1,0 +1,76 @@
+form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+form label {
+    padding: 8px 12px;
+    background-color: #FFF2;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 256px;
+
+    justify-content: center;
+}
+
+form label p {
+    font-size: .9rem;
+    sup {
+        color: var(--pink);
+        font-weight: 900;
+        user-select: none;
+    }
+    span {
+        color: #FFF4;
+        font-style: italic;
+        font-size: .8rem;
+    }
+}
+
+form label input,
+button[type="submit"] {
+    background-color: transparent;
+    border: unset;
+    outline: unset;
+    font-size: 1.5rem;
+    color: #FFF;
+}
+
+button[type="submit"] {
+    margin: 24px 0;
+    cursor: pointer;
+    padding: 8px 12px;
+    height: fit-content;
+    background-color: #FFF2;
+    font-weight: 700;
+    font-size: 1.25rem;
+
+    transition: background .3s ease;
+    &:hover {
+        background-color: #FFF4;
+    }
+}
+
+#satellite-output {
+    display: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 24px;
+
+    &:has(pre *) {
+        display: flex;
+    }
+
+    & pre {
+        padding: 8px;
+        font-family: monospace;
+    }
+
+    & section {
+        min-width: 400px;
+    }
+}

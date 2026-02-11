@@ -84,7 +84,7 @@
             font-size: 0.9rem;
             font-weight: 300;
             color: #fff8;
-            max-width: 600px;
+            max-width: 456px;
             max-height: 6ch;
 
             overflow: hidden;
@@ -108,6 +108,17 @@
             width: 8px;
             height: 8px;
             background-color: var(--lvl);
+        }
+        &::before {
+            content: attr(data-code);
+            position: absolute;
+            top: 3px;
+            left: 16px;
+
+            color: #FFF2;
+            text-transform: uppercase;
+            font-size: .6rem;
+            font-weight: 600;
         }
     }
 }
