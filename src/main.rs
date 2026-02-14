@@ -1,6 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
 use axum::{Router, middleware, routing::{get, post}};
-use tokio::sync::RwLock;
 use crate::{etat::{Etat, crash::check_for_crash}, server::serve};
 
 mod server;
@@ -11,10 +9,7 @@ mod macros;
 
 #[tokio::main]
 async fn main() {
-    let orbit = Arc::new(RwLock::new(HashMap::new()));
-    let tx = net::sse::initialize();
-
-    let etat = Etat { orbit, tx };
+    let etat = Etat::initialize();
     
     check_for_crash(etat.clone()).await;
 

@@ -9,16 +9,20 @@ export const pages_id = ['introduction', 'objectifs', 'launch', 'update',  'sign
 export interface Payload {
     navigate(id: Page): void
 }
+type SetupHandler = (payload: Payload) => Promise<void>
 
 // pages' id along with their constructor
-const pages: Record<Page, null | Promise<any & { default: (payload: Payload) => Promise<void> }>> = {
+// this strange code '() => import('...')' allows to load code at runtime,
+// the code is split under several chunk that are loaded only when necessary
+
+const pages: Record<Page, null | (() => Promise<any & { default: SetupHandler }>)> = {
     introduction: null,
-    objectifs: import('./setup/objectifs'),
-    launch: import('./setup/launch'),
-    update: import('./setup/update'),
-    signal: import('./setup/signal'),
+    objectifs: () => import('./setup/objectifs'),
+    launch: () => import('./setup/launch'),
+    update: () => import('./setup/update'),
+    signal: () => import('./setup/signal'),
     ws: null,
-    listen: import('./setup/listen')
+    listen: () => import('./setup/listen')
 }
 
 let currentPage: Page
@@ -44,7 +48,7 @@ export async function showTemplate(id: Page) {
     else await document.startViewTransition(transform).finished
 
     
-    if(pages[id] !== null) (await pages[id]).default({
+    if(pages[id] !== null) (await pages[id]()).default({
         async navigate(id: Page) {
             await showTemplate(id)
         },

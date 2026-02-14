@@ -9,5 +9,5 @@ export async function chargerModele(chemin: string) {
 }
 
 export async function chargerSatellite() {
-    return await chargerModele("./models/satellite-small.glb")
+    return await chargerModele("/models/satellite-small.glb")
 }

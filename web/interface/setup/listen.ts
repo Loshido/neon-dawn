@@ -1,7 +1,7 @@
 import type { Payload } from "../main"
 import '../styles/helper-listen.css'
 
-export default async (payload: Payload) => {
+export default async (_payload: Payload) => {
     const start = document.getElementById('listen-start') as HTMLButtonElement | null
     const stop = document.getElementById('listen-stop') as HTMLButtonElement | null
     const output = document.getElementById('listen-output') as HTMLDivElement | null

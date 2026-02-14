@@ -4,27 +4,319 @@
 		<title>🛰️ Mission Neon-Dawn</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <link rel="stylesheet" href="/styles/index.css">
-	</head>
+    </head>
 	<body>
         <aside>
-            <div class="links">
-                <div id="ping">
-                </div>
-                <button title="Recentrer sur la terre" id="earth" class="active">
-                    <img src="images/earth.svg" alt="Terre">
-                </button>
-                <button class="active" title="Affichage des satellites" id="show-satellites">
-                    <img src="images/satellite.svg" alt="Satellites">
-                </button>
-                <a href="/helper/" title="Informations">
-                    <img src="images/info.svg" alt="Informations">
-                </a>
-                <a href="https://github.com/Loshido/neon-dawn" target="_blank" title="Code source">
-                    <img src="images/github.svg" alt="Github">
-                </a>
+            <a href="https://neon-dawn.loshido.me/" target="_blank" class="show-embed">
+                🛰️ Ouvrir dans un nouvel onglet
+            </a>
+            <a href="/simulation/" class="hide-embed">
+                🛰️ Revenir à la simulation
+            </a>
+            <div id="introduction">
+                🦋 Introduction
+            </div>
+            <div id="objectifs">
+                🪸 Objectifs
+            </div>
+            <h3>REST</h3>
+            <div data-post id="launch">
+                <span class="method">POST</span>
+                /orbit/launch
+            </div>
+            <div data-post id="update">
+                <span class="method">POST</span>
+                /orbit/update
+            </div>
+            <div data-post id="signal">
+                <span class="method">POST</span>
+                /orbit/signal
+            </div>
+            <h3>
+                WS
+            </h3>
+            <div data-get id="ws">
+                <span class="method">GET</span>
+                /ws
+            </div>
+            <h3>
+                Observation
+            </h3>
+            <div data-get id="listen">
+                <span class="method">GET</span>
+                /listen
             </div>
         </aside>
-		<script type="module" src="/src/main.ts"></script>
+        <main>
+        </main>
+        <script type="module" src="/interface/main.ts"></script>
 	</body>
+    <template id="introduction-template">
+        <h1>Introduction</h1>
+        <p>
+            Comment on fait décoler un satellite?
+        </p>
+        <hr>
+        <p>
+            L'Agence spatiale européenne ESB fait un appel d'offre,
+            l'agence cherche un satellite pour mesurer les effets du changement climatique.
+        </p>
+        <p>
+            Vous devrez <strong>accomplir le plus d'objectifs possible</strong> pour attirer l'oeil de l'ESB!<br>
+        </p>
+
+        <h4>
+            Compétences à acquérir avec les objectifs
+        </h4>
+        <ul>
+            <li>
+                Apprendre et expérimenter par soi-même, sans assistance constante.
+            </li>
+            <li>
+                Comprendre les requêtes HTTP
+            </li>
+            <li>
+                Traiter et interpréter des données de position, vitesse, etc.
+            </li>
+            <li>
+                Modéliser des trajectoires ou des comportements complexes
+            </li>
+            <li>
+                Mettre en place des mises à jour en temps réel (WebSocket / SSE)
+            </li>
+            <li>
+                Créer des interfaces utilisateur pour contrôler et visualiser des données
+            </li>
+            <li>
+                Créer des graphiques et des tableaux de bord pour analyser des comportements.
+            </li>
+        </ul>
+
+        <h4>Prêt à commencer?</h4>
+        <div>
+            <a href="/#objectifs">
+                🪸 Objectifs
+            </a>
+            <p>
+                Lire les objectifs à accomplir
+            </p>
+        </div>
+        <div class="hide-embed">
+            <a href="/simulation/">
+                🛰️ Simulation
+            </a>
+            <p>
+                Accès à la simulation en temps réel
+            </p>
+        </div>
+
+        <h4>Les points de terminaisons <i style="color:#FFF4;">(endpoints / routes)</i></h4>
+        <div>
+            <a href="/#launch" data-post>
+                <span class="method">POST</span>
+                /orbit/launch
+            </a>
+            <a href="/#update" data-post>
+                <span class="method">POST</span>
+                /orbit/update
+            </a>
+            <a href="/#signal" data-post>
+                <span class="method">POST</span>
+                /orbit/signal
+            </a>
+            <a href="/#ws" data-get>
+                <span class="method">GET</span>
+                /ws
+            </a>
+            <a href="/#listen" data-get>
+                <span class="method">GET</span>
+                /listen
+            </a>
+        </div>
+    </template>
+    <template id="objectifs-template">
+        <h1>Objectifs</h1>
+        <p>
+            Les possibilités sont infinies, <a 
+                href="https://github.com/Loshido/neon-dawn/issues/new" target="_blank">
+                vous pouvez proposer des objectifs
+            </a>
+        </p>
+        <hr>
+        <div>
+            <button class="lvl lvl-0" title="Tu ne sais pas écrire de programme">Novice</button>
+            <button class="lvl lvl-1" title="Tu sais écrire un programme">Débutant</button>
+            <button class="lvl lvl-2" title="Tu parviens à te débrouiller avec un énoncé">Intermédiaire</button>
+            <button class="lvl lvl-3" title="Tu sais où chercher et comment arriver à tes fins">Avancé</button>
+            <!-- Tu vas réussir -->
+            <button class="lvl lvl-4">Expert</button>
+        </div>
+        <div class="objectifs"></div>
+        <span class="todo">to improve</span>
+    </template>
+    <template id="launch-template">
+        <h1 data-post>
+            <span class="method">POST</span>
+            /orbit/launch
+        </h1>
+        <p>
+            Lancer un satellite en orbite.
+        </p>
+        <hr>
+        <form>
+            <label for="satellite-name">
+                <p>Nom du satellite<sup>*</sup> <span>string</span></p>
+                <input type="text" name="name" id="satellite-name"
+                    placeholder="IE203">
+            </label>
+            <label for="satellite-color">
+                <p>Couleur du satellite<sup>*</sup> <span>[number, number, number]</span></p>
+                <input type="color" name="color" id="satellite-color" value="#FF0000">
+            </label>
+            <label for="satellite-payload">
+                <p>Citation<sup>*</sup> <span>string</span></p>
+                <input type="text" name="payload" id="satellite-payload"
+                    placeholder="Jusqu'à l'infini et au delà!">
+            </label>
+        </form>
+        <button type="submit">
+            Lancement
+        </button>
+
+        <p id="satellite-error" style="display: none;">
+
+        </p>
+
+        <div id="satellite-output">
+            <section>
+                <h3>Requête envoyée</h3>
+                <pre id="satellite-in">
+    
+                </pre>
+            </section>
+
+            <section>
+                <h3>Réponse reçue</h3>
+                <pre id="satellite-out">
+
+                </pre>
+            </section>
+        </div>
+    </template>
+    <template id="update-template">
+        <h1 data-post>
+            <span class="method">POST</span>
+            /orbit/update
+        </h1>
+        <p>
+            Modifier le satellite en orbite.
+        </p>
+        <hr>
+        <form>
+            <label for="satellite-name">
+                <p>Nouveau nom du satellite <span>string</span></p>
+                <input type="text" name="name" id="satellite-name"
+                    placeholder="IE204">
+            </label>
+            <label for="satellite-color">
+                <p>Nouvelle couleur du satellite <span>[number, number, number]</span></p>
+                <input type="color" name="color" id="satellite-color" value="#FF11CC">
+            </label>
+        </form>
+        <button type="submit">
+            Mettre à jour
+        </button>
+
+        <p id="satellite-error" style="display: none;">
+
+        </p>
+
+        <div id="satellite-output">
+            <section>
+                <h3>Requête envoyée</h3>
+                <pre id="satellite-in">
+    
+                </pre>
+            </section>
+
+            <section>
+                <h3>Réponse reçue</h3>
+                <pre id="satellite-out">
+
+                </pre>
+            </section>
+        </div>
+    </template>
+    <template id="signal-template">
+        <h1 data-post>
+            <span class="method">POST</span>
+            /orbit/signal
+        </h1>
+        <p>
+            Signaler la nouvelle position du satellite.
+        </p>
+        <hr>
+        <form>
+            <label for="satellite-position">
+                <p>Position<sup>*</sup> <span>[number, number, number]</span></p>
+                <input type="text" name="position" id="satellite-position"
+                    placeholder="[0.2, 2.3, -1.3]">
+            </label>
+            <label for="satellite-rotation" title="Euler">
+                <p>Rotation <span>[number, number, number]</span></p>
+                <input type="text" name="rotation" id="satellite-rotation"
+                    placeholder="[3.14, 0.0, 0.0]">
+            </label>
+        </form>
+        <button type="submit">
+            Signaler
+        </button>
+
+        <p id="satellite-error" style="display: none;">
+
+        </p>
+
+        <div id="satellite-output">
+            <section>
+                <h3>Requête envoyée</h3>
+                <pre id="satellite-in">
+    
+                </pre>
+            </section>
+
+            <section>
+                <h3>Réponse reçue</h3>
+                <pre id="satellite-out">
+
+                </pre>
+            </section>
+        </div>
+    </template>
+    <template id="ws-template">
+        <h1 data-get>
+            <span class="method">GET</span>
+            /ws
+        </h1>
+        <p>
+            Passer sur le protocole Websocket.
+        </p>
+        <hr>
+        <span class="todo">todo</span>
+    </template>
+    <template id="listen-template">
+        <h1 data-get>
+            <span class="method">GET</span>
+            /listen
+        </h1>
+        <p>
+            Écouter les évènements.
+        </p>
+        <hr>
+        <div class="actions">
+            <button id="listen-start" class="active">Écouter</button>
+            <button id="listen-stop">Arrêter</button>
+        </div>
+        <span class="todo">to improve</span>
+        <div id="listen-output"></div>
+    </template>
 </html>

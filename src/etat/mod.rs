@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::{RwLock, broadcast::Sender};
-use crate::{etat::satellite::Satellite, events::Events};
+use crate::{etat::satellite::Satellite, events::Events, net::sse};
 
 mod orbit;
 pub(super) mod crash;
@@ -15,5 +15,11 @@ pub struct Etat {
 impl Etat {
     pub fn broadcast(&self, event: Events) -> Option<usize> {
         self.tx.send(event.to_json()).ok()
+    }
+    pub fn initialize() -> Self {
+        let orbit = Arc::new(RwLock::new(HashMap::new()));
+        let tx = sse::initialize();
+
+        Self { orbit, tx }
     }
 }

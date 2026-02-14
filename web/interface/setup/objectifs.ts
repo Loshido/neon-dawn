@@ -125,7 +125,7 @@ function createObjectif(obj: Objectif) {
     return div
 }
 
-export default async (payload: Payload) => {
+export default async (_payload: Payload) => {
     document.querySelectorAll('#objectifs-active button.lvl')
         .forEach(el => el.addEventListener('click', () => el.classList.toggle('active')))
     

@@ -24,7 +24,7 @@ export default class Satellite {
             <div class="color active"><div></div></div>
             <div class="name"></div>
             <div class="actions">
-                <img src="images/cctv.svg" alt="CCTV" class="focus">
+                <img src="/images/cctv.svg" alt="CCTV" class="focus">
             </div>`
 
         this.recolor(color)

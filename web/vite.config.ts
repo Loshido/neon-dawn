@@ -4,14 +4,14 @@ import path from "path"
 export default defineConfig({
     resolve: {
         alias: {
-            "~": path.resolve(__dirname, "./src")
+            "~": path.resolve(__dirname, "./simulation")
         }
     },
     build: {
         rolldownOptions: {
             input: {
-                index: "./index.html",
-                helper: "./helper/index.html"
+                simulation: "./simulation/index.html",
+                interface: "./index.html"
             }
         }
     }
