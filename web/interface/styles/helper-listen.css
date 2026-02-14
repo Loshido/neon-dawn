@@ -34,3 +34,56 @@
     &#listen-start.active:hover { --c: var(--start-active-hover); }
     &#listen-stop.active:hover { --c: var(--stop-active-hover); }
 }
+
+
+span.event {
+    font-size: .7rem;
+    font-weight: 700;
+    padding: 2px 4px;
+    border-radius: 4px;
+    user-select: none;
+    color: #FFF;
+
+    width: fit-content;
+    height: fit-content;
+
+    &.Sync {
+        background-color: rgb(255, 15, 215);
+    }
+    &.Position {
+        background-color: rgb(47, 190, 18);
+    }
+    &.Crash {
+        background-color: rgb(255, 39, 39);
+    }
+    &.Launch {
+        background-color: rgb(32, 32, 255);
+    }
+    &.Update {
+        background-color: rgb(255, 177, 32);
+    }
+}
+
+#listen-output {
+    padding: 8px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-content: start;
+    flex-wrap: wrap;
+    max-height: 60dvh;
+}
+#listen-output > div {
+    display: flex; 
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+    font-family: monospace;
+    min-width: 160px;
+    width: fit-content;
+
+    & * {
+        margin: 0;
+    }
+}

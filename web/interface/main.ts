@@ -22,7 +22,7 @@ const pages: Record<Page, null | (() => Promise<any & { default: SetupHandler }>
     update: () => import('./setup/update'),
     signal: () => import('./setup/signal'),
     ws: null,
-    listen: () => import('./setup/listen')
+    listen: () => import('./setup/listen/mod')
 }
 
 let currentPage: Page
@@ -43,10 +43,6 @@ export async function showTemplate(id: Page) {
     currentPage === 'introduction' || id === 'introduction' 
         ? await transition(transform) 
         : transform()
-
-    if(!document.startViewTransition) transform()
-    else await document.startViewTransition(transform).finished
-
     
     if(pages[id] !== null) (await pages[id]()).default({
         async navigate(id: Page) {
@@ -76,8 +72,7 @@ function toggleActive(id: Page) {
 // Initializes Menu
 Object.keys(pages)
     .map(page => document.getElementById(page) as HTMLDivElement | null)
-    .filter(div => !!div)
-    .forEach(page => page.addEventListener('click', () => showTemplate(page.id as Page)))
+    .forEach(page => page?.addEventListener('click', () => showTemplate(page.id as Page)))
 
 setupSearchParams()
 
