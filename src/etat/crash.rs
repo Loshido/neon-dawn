@@ -9,9 +9,9 @@ impl Etat {
         let now = Instant::now();
         let mut crashed = Vec::new();
         
-        for (ip, satellite) in satellites.iter() {
+        for (name, satellite) in satellites.iter() {
             if now.duration_since(satellite.instant) > DURATION_UNTIL_CRASHED {
-                    crashed.push(ip.clone());
+                    crashed.push(name.clone());
             }
         }
 
@@ -25,8 +25,8 @@ impl Etat {
         }
         
         let mut satellites = self.orbit.write().await;
-        for ip in expired {
-            let satellite = satellites.remove(&ip);
+        for name in expired {
+            let satellite = satellites.remove(&name);
             if let Some(satellite) = satellite {
                 self.broadcast(Events::Crash { name: satellite.name });
             }

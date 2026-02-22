@@ -10,18 +10,21 @@ pub struct Satellite {
     pub rotation: Option<(f32, f32, f32)>,
 
     #[serde(skip)]
-    pub instant: Instant
+    pub instant: Instant,
+    #[serde(skip)]
+    pub ip: String
 }
 
 impl Satellite {
-    pub fn launch(name: &String, color: [u8; 3]) -> Self {
+    pub fn launch(name: &String, color: [u8; 3], ip: &String) -> Self {
         Self {
             name: name.to_string(),
             color,
             position: (0.0, 10.0, 0.0),
             rotation: None,
 
-            instant: Instant::now()
+            instant: Instant::now(),
+            ip: ip.clone()
         }
     }
 

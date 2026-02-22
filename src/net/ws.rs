@@ -7,8 +7,8 @@ use crate::{Etat, server::ip::ClientIp};
 #[serde(tag = "type")]
 enum IncomingEvent {
     Launch { name: String, color: [u8; 3], citation: String },
-    Update { name: Option<String>, color: Option<[u8; 3]> },
-    Signal { position: (f32, f32, f32), rotation: Option<(f32, f32, f32)> }
+    Update { satellite: String, name: Option<String>, color: Option<[u8; 3]> },
+    Signal { name: String, position: (f32, f32, f32), rotation: Option<(f32, f32, f32)> }
 }
 
 pub async fn ws_handle(
@@ -39,11 +39,11 @@ async fn handle_socket(mut socket: WebSocket, ip: String, etat: Etat) {
             IncomingEvent::Launch { name, color, citation } => {
                 etat.launch(&ip, name, color, citation).await.ok()
             },
-            IncomingEvent::Signal { position, rotation } => {
-                etat.signal(&ip, position, rotation).await.ok()
+            IncomingEvent::Signal { name, position, rotation } => {
+                etat.signal(&ip, &name, position, rotation).await.ok()
             },
-            IncomingEvent::Update { name, color } => {
-                etat.update(&ip, name, color).await.ok()
+            IncomingEvent::Update { satellite, name, color } => {
+                etat.update(&ip, &satellite, name, color).await.ok()
             }
         };
 
