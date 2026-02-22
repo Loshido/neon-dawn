@@ -39,7 +39,7 @@ impl Etat {
             }
         }
 
-        let satellite = orbit.get_mut(satellite_name).unwrap();
+        let satellite = orbit.get_mut(satellite_name).ok_or(())?;
         if let Some(color) = color {
             satellite.update_color(color);
         }
@@ -51,7 +51,7 @@ impl Etat {
 
         if let Some(ref new_name) = name {
             if new_name != satellite_name {
-                let mut sat = orbit.remove(satellite_name).unwrap();
+                let mut sat = orbit.remove(satellite_name).ok_or(())?;
                 sat.update_name(new_name);
                 orbit.insert(new_name.clone(), sat);
             }
