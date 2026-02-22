@@ -19,6 +19,7 @@ function stringToVec3(vec: string): [number, number, number] | string {
 
 export default async (_payload: Payload) => {
     const submit = document.querySelector('button[type="submit"]') as HTMLButtonElement
+    const name = document.getElementById('satellite-name') as HTMLInputElement
     const position = document.getElementById('satellite-position') as HTMLInputElement
     const rotation = document.getElementById('satellite-rotation') as HTMLInputElement
     const erreur = document.getElementById('satellite-error') as HTMLParagraphElement
@@ -26,7 +27,14 @@ export default async (_payload: Payload) => {
     const launchOut = document.getElementById('satellite-out') as HTMLPreElement
     
     async function process() {
+        if(name.value.length === 0) {
+            erreur.style.display = 'block'
+            erreur.innerText = 'Vous devez donner le nom du satellite!'
+            return
+        }
+
         const body = {
+            name: name.value,
             position: stringToVec3(position.value),
             rotation: rotation.value.length > 0 ? stringToVec3(rotation.value) : undefined,
         }

@@ -13,6 +13,7 @@ function colorHexToArray(color: string): [number, number, number] {
 
 export default async (_payload: Payload) => {
     const submit = document.querySelector('button[type="submit"]') as HTMLButtonElement
+    const satellite = document.getElementById('satellite-target') as HTMLInputElement
     const name = document.getElementById('satellite-name') as HTMLInputElement
     const color = document.getElementById('satellite-color') as HTMLInputElement
     const erreur = document.getElementById('satellite-error') as HTMLParagraphElement
@@ -20,8 +21,8 @@ export default async (_payload: Payload) => {
     const launchOut = document.getElementById('satellite-out') as HTMLPreElement
     
     function checkForIncorrectInput(): string | null {
-        if(name.value.length === 0)
-            return "Vous devez donner un nom au satellite!"
+        if(satellite.value.length === 0)
+            return "Vous devez donner le nom du satellite à modifier!"
     
         return null
     }
@@ -34,9 +35,15 @@ export default async (_payload: Payload) => {
             return
         } else erreur.style.display = 'none'
         
-        const body = {
-            name: name.value,
-            color: colorHexToArray(color.value),
+        const body: Record<string, any> = {
+            satellite: satellite.value,
+        }
+
+        if(name.value.length > 0) {
+            body.name = name.value
+        }
+        if(color.value) {
+            body.color = colorHexToArray(color.value)
         }
     
         const bodySerialized = JSON.stringify(body)

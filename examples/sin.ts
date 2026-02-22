@@ -11,10 +11,12 @@ const ws = new WebSocket('https://neon-dawn.loshido.me/ws')
 let interval: number | undefined
 let interval_duration = 333
 let t = 0;
+let satellite_name: string;
 ws.addEventListener('open', _ => {
+    satellite_name = "IE" + Math.floor(Math.random() * 255).toString().padStart(3, '0');
     const launch = {
         type: "Launch",
-        name: "IE" + Math.floor(Math.random() * 255).toString().padStart(3, '0'),
+        name: satellite_name,
         color: [0, 250, 250],
         citation: "Deno on his way"
     }
@@ -25,6 +27,7 @@ ws.addEventListener('open', _ => {
         t += interval_duration / 100
         const position = {
             type: "Signal",
+            name: satellite_name,
             position: [
                 1.5 * Math.cos(t / 100),
                 1.5 * Math.sin(t / 100),

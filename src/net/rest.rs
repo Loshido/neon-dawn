@@ -36,6 +36,7 @@ pub async fn launch(
 
 #[derive(Deserialize)]
 pub struct Update {
+    satellite: String,
     name: Option<String>,
     color: Option<[u8; 3]>
 }
@@ -48,7 +49,7 @@ pub async fn update(
     let origin = ip.to_string();
 
     let event = etat
-        .update(&origin, update.name, update.color)
+        .update(&origin, &update.satellite, update.name, update.color)
         .await
         .ok();
 
@@ -67,6 +68,7 @@ pub async fn update(
 
 #[derive(Deserialize)]
 pub struct Signal {
+    name: String,
     position: (f32, f32, f32),
     rotation: Option<(f32, f32, f32)>
 }
@@ -79,7 +81,7 @@ pub async fn signal(
     let origin = ip.to_string();
 
     let event = etat
-        .signal(&origin, signal.position, signal.rotation)
+        .signal(&origin, &signal.name, signal.position, signal.rotation)
         .await
         .ok();
 
